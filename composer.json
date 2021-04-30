@@ -2,7 +2,7 @@
   "name": "geniepress/framework",
   "description": "The GeniePress framework",
   "keywords": ["framework", "wordpress"],
-  "type": "project",
+  "type": "library",
   "license": "MIT",
   "require": {
     "php": "^7.3.0|^8.0",
