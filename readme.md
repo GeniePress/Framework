@@ -19,4 +19,4 @@ All security vulnerabilities will be promptly addressed.
 The GeniePress framework is open-sourced software licensed under the [MIT 
 license](https://opensource.org/licenses/MIT).
 
-Version 0.1.0
+Version 1.0.0
