@@ -189,7 +189,7 @@ class Genie
     public function enableApiHandler(string $pathName = 'api', string $actionName = 'genie_api'): Genie
     {
         Registry::push('genie_config','api_path', $pathName);
-        Registry::push('genie_config','action_name', $actionName);
+        Registry::push('genie_config','api_action', $actionName);
 
         return $this->addComponent(ApiHandler::class);
     }
