@@ -35,8 +35,8 @@ class ApiHandler implements GenieComponent
          */
         HookInto::action('init')
             ->run(function () {
-                $path   = apply_filters('genie_api_path', Registry::get('genie_api_path'));
-                $action = apply_filters('genie_api_action', Registry::get('genie_api_action'));
+                $path   = apply_filters('genie_api_path', Registry::get('genie_config', 'api_path'));
+                $action = apply_filters('genie_api_action', Registry::get('genie_config', 'api_action'));
 
                 add_rewrite_rule($path.'/(.*)$', 'wp-admin/admin-ajax.php?action='.$action.'&route=$1', 'top');
 
@@ -153,7 +153,7 @@ class ApiHandler implements GenieComponent
      */
     public static function generateUrl($route): string
     {
-        $path = apply_filters('genie_api_path', Registry::get('genie_api_path'));
+        $path = apply_filters('genie_api_path', Registry::get('genie_config', 'api_path'));
 
         return home_url($path.'/'.$route);
     }

@@ -49,7 +49,7 @@ class Genie
         // Add genie folder last, so they can be overridden
         $viewFolders[] = trailingslashit(dirname(__FILE__)).'Views';
 
-        Registry::set('genie_view_folders', $viewFolders);
+        Registry::push('genie_config','view_folders', $viewFolders);
 
         $this->fill([
             'components' => [
@@ -171,7 +171,7 @@ class Genie
      */
     public function enableAjaxHandler(string $actionName = 'ajax'): Genie
     {
-        Registry::set('genie_ajax_action', $actionName);
+        Registry::push('genie_config','ajax_action', $actionName);
 
         return $this->addComponent(AjaxHandler::class);
     }
@@ -188,8 +188,8 @@ class Genie
      */
     public function enableApiHandler(string $pathName = 'api', string $actionName = 'genie_api'): Genie
     {
-        Registry::set('genie_api_path', $pathName);
-        Registry::set('genie_action_name', $actionName);
+        Registry::push('genie_config','api_path', $pathName);
+        Registry::push('genie_config','api_action', $actionName);
 
         return $this->addComponent(ApiHandler::class);
     }
@@ -205,7 +205,7 @@ class Genie
      */
     public function enableBackgroundJobs(string $variableName = 'genie_bj_id'): Genie
     {
-        Registry::set('genie_bj_id', $variableName);
+        Registry::push('genie_config','bj_id', $variableName);
 
         return $this->addComponent(BackgroundJob::class);
     }
@@ -236,7 +236,7 @@ class Genie
         $folder = trailingslashit($this->folder).$folder;
 
         if (file_exists($folder)) {
-            Registry::set('genie_release_folder', $folder);
+            Registry::push('genie_config','release_folder', $folder);
         }
 
         return $this->addComponent(Deploy::class);
@@ -253,7 +253,7 @@ class Genie
      */
     public function enableSessions(string $name = 'genie_session'): Genie
     {
-        Registry::set('genie_session_name', $name);
+        Registry::push('genie_config','session_name', $name);
 
         return $this->addComponent(Session::class);
     }
@@ -283,7 +283,9 @@ class Genie
     {
         // Load and stash our configuration so we can use it in static methods
         $config = apply_filters('genie_config', $this->getData());
-        Registry::set('genie_config', $config);
+        foreach ($config as $index => $value ) {
+            Registry::push('genie_config', $index,$value);
+        }
 
         // Load Required Genie Components
         View::setup();

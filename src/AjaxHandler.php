@@ -197,7 +197,7 @@ class AjaxHandler implements GenieComponent
     protected static function getActionName(): string
     {
         if ( ! static::$action) {
-            static::$action = apply_filters('genie_ajax_action', Registry::get('genie_ajax_action'));
+            static::$action = apply_filters('genie_ajax_action', Registry::get('genie_config', 'ajax_action'));
         }
 
         return static::$action;
