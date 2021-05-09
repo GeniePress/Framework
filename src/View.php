@@ -23,14 +23,12 @@ use Twig\TwigFilter;
 class View implements GenieComponent
 {
 
-
     /**
      * Twig Object
      *
      * @var Environment
      */
     protected static $twig;
-
 
     /**
      * an array of key value pairs sent to the twig template
@@ -39,14 +37,12 @@ class View implements GenieComponent
      */
     protected $vars = [];
 
-
     /**
      * The twig template. This could be a filename or a string.
      *
      * @var string
      */
     protected $template;
-
 
     /**
      * Should we process shortcodes in the template?
@@ -55,7 +51,6 @@ class View implements GenieComponent
      */
     protected $processShortcodes = true;
 
-
     /**
      * The type of template we're processing
      *
@@ -63,19 +58,6 @@ class View implements GenieComponent
      */
     protected $templateType = 'file';
 
-
-    /**
-     * View constructor.
-     *
-     * @param string $template
-     */
-    function __construct(string $template)
-    {
-        $this->template = $template;
-        $this->templateType = substr(strtolower($template), -5) === '.twig' ? 'file' : 'string';
-        $this->cache = !WP_DEBUG;
-        $this->debug = WP_DEBUG;
-    }
 
 
     /**
@@ -86,12 +68,12 @@ class View implements GenieComponent
         // Note the sequence. this runs before anything else
         HookInto::action('init', 1)
             ->run(function () {
-                $debug = apply_filters('genie_view_debug', WP_DEBUG);
-                $cache = apply_filters('genie_view_cache', !WP_DEBUG);
-                $pathArray = apply_filters('genie_view_folders', Genie::getViewFolders());
+                $debug     = apply_filters('genie_view_debug', WP_DEBUG);
+                $cache     = apply_filters('genie_view_cache', ! WP_DEBUG);
+                $pathArray = apply_filters('genie_view_folders', Registry::get('genie_view_folders'));
 
                 $fileLoader = new FilesystemLoader($pathArray);
-                $loader = new ChainLoader([$fileLoader]);
+                $loader     = new ChainLoader([$fileLoader]);
 
                 $configArray = [
                     'autoescape'  => false,
@@ -110,7 +92,7 @@ class View implements GenieComponent
                 if ($debug) {
                     $twig->addExtension(new DebugExtension());
                 }
-                $filter = new TwigFilter('json', Tools::class . '::jsonSafe');
+                $filter = new TwigFilter('json', Tools::class.'::jsonSafe');
                 $twig->addFilter($filter);
 
                 $filter = new TwigFilter('wpautop', 'wpautop');
@@ -119,7 +101,6 @@ class View implements GenieComponent
                 self::$twig = apply_filters('genie_view_twig', $twig);
             });
 
-
         // The shortcode genie_view allows you to have a twig template embedded in content
         AddShortcode::called('genie_view')->run(
             function ($incomingAttributes, $content) {
@@ -127,7 +108,7 @@ class View implements GenieComponent
                     'view' => '',
                 ], $incomingAttributes);
 
-                if (!$attributes->view) {
+                if ( ! $attributes->view) {
                     if (isset($incomingAttributes[0])) {
                         $attributes['view'] = $incomingAttributes[0];
                     } else {
@@ -142,18 +123,20 @@ class View implements GenieComponent
     }
 
 
-    /**
-     * Get cache folder for Twig
-     *
-     * @return string
-     */
-    protected static function getCacheFolder()
-    {
-        $upload = wp_upload_dir();
-        $upload_dir = $upload['basedir'];
 
-        return apply_filters('genie_view_cache_folder', $upload_dir . '/twig_cache');
+    /**
+     * View constructor.
+     *
+     * @param  string  $template
+     */
+    function __construct(string $template)
+    {
+        $this->template     = $template;
+        $this->templateType = substr(strtolower($template), -5) === '.twig' ? 'file' : 'string';
+        $this->cache        = ! WP_DEBUG;
+        $this->debug        = WP_DEBUG;
     }
+
 
 
     /**
@@ -163,21 +146,112 @@ class View implements GenieComponent
      *
      * @return bool
      */
-    public static function isValidTwig($string) {
+    public static function isValidTwig($string): bool
+    {
         try {
             static::$twig->tokenize(new Source($string, 'isValidTwig'));
+
             return true;
         } catch (SyntaxError $e) {
             return false;
         }
     }
 
+
+
+    /**
+     * Static constructor
+     * Which template to use?  This could be a file or a string
+     *
+     * @param $template
+     *
+     * @return static
+     */
+    public static function with($template): View
+    {
+        return new static($template);
+    }
+
+
+
+    /**
+     * Add a variable to be sent to twig
+     *
+     * @param $var
+     * @param $value
+     *
+     * @return $this
+     */
+    public function addVar($var, $value): View
+    {
+        $this->vars[$var] = $value;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Add variables to the twig template
+     *
+     * @param  array  $fields
+     *
+     * @return $this
+     */
+    public function addVars(array $fields): View
+    {
+        $this->vars = array_merge($this->vars, $fields);
+
+        return $this;
+    }
+
+
+
+    /**
+     * do not process shortcodes
+     *
+     * @return $this
+     */
+
+    function disableShortcodes(): View
+    {
+        $this->processShortcodes = false;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Output the view rather than return it.
+     */
+    public function display()
+    {
+        echo $this->render();
+    }
+
+
+
+    /**
+     * Enabled shortcode on this template
+     *
+     * @return $this
+     */
+    function enableShortcodes(): View
+    {
+        $this->processShortcodes = true;
+
+        return $this;
+    }
+
+
+
     /**
      * Render a twig Template
      *
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         $site = apply_filters('genie_get_site_var', [
             'urls' => [
@@ -193,7 +267,7 @@ class View implements GenieComponent
         try {
             if ($this->templateType === 'string') {
                 $template = static::$twig->createTemplate($this->template);
-                $html = $template->render($vars);
+                $html     = $template->render($vars);
             } else {
                 $html = static::$twig->render($this->template, $vars);
             }
@@ -209,84 +283,18 @@ class View implements GenieComponent
     }
 
 
-    /**
-     * Add variables to the twig template
-     *
-     * @param array $fields
-     *
-     * @return $this
-     */
-    public function addVars(array $fields)
-    {
-        $this->vars = array_merge($this->vars, $fields);
-
-        return $this;
-    }
-
 
     /**
-     * Static constructor
-     * Which template to use?  This could be a file or a string
+     * Get cache folder for Twig
      *
-     * @param $template
-     *
-     * @return static
+     * @return string
      */
-    public static function with($template)
+    protected static function getCacheFolder(): string
     {
-        return new static($template);
-    }
+        $upload     = wp_upload_dir();
+        $upload_dir = $upload['basedir'];
 
-
-    /**
-     * Enabled shortcode on this template
-     *
-     * @return $this
-     */
-    function enableShortcodes()
-    {
-        $this->processShortcodes = true;
-
-        return $this;
-    }
-
-
-    /**
-     * do not process shortcodes
-     *
-     * @return $this
-     */
-
-    function disableShortcodes()
-    {
-        $this->processShortcodes = false;
-
-        return $this;
-    }
-
-
-    /**
-     * Add a variable to be sent to twig
-     *
-     * @param $var
-     * @param $value
-     *
-     * @return $this
-     */
-    public function addVar($var, $value)
-    {
-        $this->vars[$var] = $value;
-
-        return $this;
-    }
-
-
-    /**
-     * Output the view rather than return it.
-     */
-    public function display()
-    {
-        echo $this->render();
+        return apply_filters('genie_view_cache_folder', $upload_dir.'/twig_cache');
     }
 
 }

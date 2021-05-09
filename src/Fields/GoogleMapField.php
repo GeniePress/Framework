@@ -7,23 +7,40 @@ use GeniePress\Abstracts\Field;
 class GoogleMapField extends Field
 {
 
-
-    public function centerLatitude($latitude)
+    /**
+     * @param $latitude
+     *
+     * @return GoogleMapField
+     */
+    public function centerLatitude($latitude): GoogleMapField
     {
         return $this->set('center_lat', $latitude);
     }
 
 
-    public function centerLongitude($longitude)
+
+    /**
+     * @param $longitude
+     *
+     * @return GoogleMapField
+     */
+    public function centerLongitude($longitude): GoogleMapField
     {
         return $this->set('center_lng', $longitude);
     }
 
 
-    public function zoom($zoom)
+
+    /**
+     * @param $zoom
+     *
+     * @return GoogleMapField
+     */
+    public function zoom($zoom): GoogleMapField
     {
         return $this->set('zoom', $zoom);
     }
+
 
 
     /**

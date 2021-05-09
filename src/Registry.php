@@ -11,13 +11,13 @@ namespace GeniePress;
 class Registry
 {
 
-
     /**
      * array of values
      *
      * @var
      */
     private static $registry = [];
+
 
 
     /**
@@ -31,9 +31,10 @@ class Registry
     public static function get($group, $index = null)
     {
         if (is_null($index)) {
-            if (!isset(static::$registry[$group])) {
+            if ( ! isset(static::$registry[$group])) {
                 static::$registry[$group] = [];
             }
+
             return static::$registry[$group];
         }
 
@@ -45,6 +46,7 @@ class Registry
     }
 
 
+
     /**
      * Add a value to a registry array
      *
@@ -54,11 +56,12 @@ class Registry
      */
     public static function push($group, $index, $value)
     {
-        if (!isset(static::$registry[$group])) {
+        if ( ! isset(static::$registry[$group])) {
             static::$registry[$group] = [];
         }
         static::$registry[$group][$index] = $value;
     }
+
 
 
     /**

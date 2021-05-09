@@ -5,13 +5,13 @@ namespace GeniePress\Traits;
 trait HasData
 {
 
-
     /**
      * Used to store the post data
      *
      * @var array
      */
     protected $data = [];
+
 
 
     /**
@@ -31,44 +31,6 @@ trait HasData
     }
 
 
-    /**
-     * magic set
-     *
-     * @param $var
-     * @param $value
-     */
-    public function __set($var, $value)
-    {
-        $this->data[$var] = $value;
-    }
-
-
-    /**
-     * Return all data for this post
-     *
-     * @return mixed|void
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-
-    /**
-     * Fill data properties from an array
-     *
-     * @param array $array
-     *
-     * @return static
-     */
-    public function fill(array $array)
-    {
-        foreach ($array as $field => $value) {
-            $this->data[$field] = $value;
-        }
-        return $this;
-    }
-
 
     /**
      * Needed from twig templates
@@ -82,5 +44,47 @@ trait HasData
         return array_key_exists($var, $this->data);
     }
 
+
+
+    /**
+     * magic set
+     *
+     * @param $var
+     * @param $value
+     */
+    public function __set($var, $value)
+    {
+        $this->data[$var] = $value;
+    }
+
+
+
+    /**
+     * Fill data properties from an array
+     *
+     * @param  array  $array
+     *
+     * @return static
+     */
+    public function fill(array $array)
+    {
+        foreach ($array as $field => $value) {
+            $this->data[$field] = $value;
+        }
+
+        return $this;
+    }
+
+
+
+    /**
+     * Return all data for this post
+     *
+     * @return mixed|void
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
 
 }

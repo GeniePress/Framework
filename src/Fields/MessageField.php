@@ -7,28 +7,32 @@ use GeniePress\Abstracts\Field;
 class MessageField extends Field
 {
 
+    /**
+     * Should HTML be escaped ?
+     *
+     * @param  bool  $escape
+     *
+     * @return $this
+     */
+    public function escapeHTML(bool $escape): MessageField
+    {
+        return $this->set('esc_html', $escape);
+    }
+
+
 
     /**
      *Text shown
      *
-     * @param string $message
+     * @param  string  $message
      *
      * @return $this
      */
-    public function message(string $message)
+    public function message(string $message): MessageField
     {
         return $this->set('message', $message);
     }
 
-
-    protected function setDefaults()
-    {
-        parent::setDefaults();
-        $this->type('message');
-        $this->displayOnly(true);
-        $this->newLines('wpautop');
-        $this->escapeHTML(false);
-    }
 
 
     /**
@@ -38,22 +42,23 @@ class MessageField extends Field
      *
      * @return $this
      */
-    public function newLines(string $newLines)
+    public function newLines(string $newLines): MessageField
     {
         return $this->set('new_lines', $newLines);
     }
 
 
+
     /**
-     * Should HTML be escaped ?
-     *
-     * @param bool $escape
-     *
-     * @return $this
+     * Set Defaults
      */
-    public function escapeHTML(bool $escape)
+    protected function setDefaults()
     {
-        return $this->set('esc_html', $escape);
+        parent::setDefaults();
+        $this->type('message');
+        $this->displayOnly(true);
+        $this->newLines('wpautop');
+        $this->escapeHTML(false);
     }
 
 }

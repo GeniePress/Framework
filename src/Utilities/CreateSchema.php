@@ -5,7 +5,6 @@ namespace GeniePress\Utilities;
 use GeniePress\Abstracts\Condition;
 use GeniePress\Abstracts\Field;
 use GeniePress\Debug;
-use GeniePress\Tools;
 
 /**
  * Class CreateSchema
@@ -18,38 +17,28 @@ use GeniePress\Tools;
 class CreateSchema
 {
 
-
     private $key;
-
 
     private $title;
 
-
     private $menu_order = 0;
-
 
     private $location;
 
-
     private $position = 'normal';  //acf_after_title|normal|side
-
 
     private $style = 'default';   //default|seamless
 
-
     private $label_placement = 'top'; // top|left
-
 
     private $instruction_placement = 'label'; // label|field
 
-
     private $hide_on_screen = [];
-
 
     private $fields = [];
 
-
     private $attachTo = null;
+
 
 
     /**
@@ -59,9 +48,10 @@ class CreateSchema
      */
     public function __construct($title)
     {
-        $this->key = 'group_' . sanitize_title($title);
+        $this->key   = 'group_'.sanitize_title($title);
         $this->title = $title;
     }
+
 
 
     /**
@@ -72,10 +62,11 @@ class CreateSchema
      * @return CreateSchema
      */
 
-    public static function called($name)
+    public static function called($name): CreateSchema
     {
         return new static($name);
     }
+
 
 
     /**
@@ -85,12 +76,13 @@ class CreateSchema
      *
      * @return $this
      */
-    public function attachTo($class)
+    public function attachTo($class): CreateSchema
     {
         $this->attachTo = $class;
 
         return $this;
     }
+
 
 
     /**
@@ -102,42 +94,191 @@ class CreateSchema
     }
 
 
+
     /**
-     * Create the schema for ACF, and attach if necessary.
+     * An Array of Wordpress elements to hide on Screen
+     * 'permalink',
+     * 'the_content',
+     * 'excerpt',
+     * 'discussion',
+     * 'comments',
+     * 'revisions',
+     * 'slug',
+     * 'author',
+     * 'format',
+     * 'page_attributes',
+     * 'featured_image',
+     * 'categories',
+     * 'tags',
+     * 'send-trackbacks',
+     *
+     * @param  array  $hide_on_screen
+     *
+     * @return $this
+     */
+    public function hideOnScreen(array $hide_on_screen): CreateSchema
+    {
+        $this->hide_on_screen = $hide_on_screen;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Instruction Placement
+     *
+     * @param  string  $instruction_placement
+     *
+     * @return $this
+     */
+    public function instructionPlacement(string $instruction_placement): CreateSchema
+    {
+        $this->instruction_placement = $instruction_placement;
+
+        return $this;
+    }
+
+
+
+    /**
+     * label placement
+     *
+     * @param  string  $label_placement
+     *
+     * @return $this
+     */
+    public function labelPlacement(string $label_placement): CreateSchema
+    {
+        $this->label_placement = $label_placement;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Menu Order
+     *
+     * @param  int  $menuOrder
+     *
+     * @return $this
+     */
+    public function menuOrder(int $menuOrder): CreateSchema
+    {
+        $this->menu_order = $menuOrder;
+
+        return $this;
+    }
+
+
+
+    /**
+     * position
+     *
+     * @param  string  $position
+     *
+     * @return $this
+     */
+    public function position(string $position): CreateSchema
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Generate and register the schema with ACF
+     *
+     * @param  int  $sequence
+     */
+    function register(int $sequence = 20)
+    {
+        HookInto::action('init', $sequence)
+            ->run(function () {
+                $schema = $this->return();
+                acf_add_local_field_group($schema);
+            });
+    }
+
+
+
+    /**
+     * Generate the Schema Array
      *
      * @return array
      */
-    protected function generateSchemaArray()
+    function return(): array
     {
-        $fields = [];
-        foreach ($this->fields as $field) {
-            $fields[] = $field->generate(sanitize_title($this->title));
-        }
-
-        foreach ($fields as &$field) {
-            $field = $this->convertNameToKey($field, $fields);
-        }
-
-        $schema =
-            [
-                'key'                   => $this->key,
-                'title'                 => $this->title,
-                'menu_order'            => $this->menu_order,
-                'fields'                => $fields,
-                'location'              => $this->location,
-                'position'              => $this->position,
-                'style'                 => $this->style,
-                'label_placement'       => $this->label_placement,
-                'instruction_placement' => $this->instruction_placement,
-                'hide_on_screen'        => $this->hide_on_screen,
-            ];
-
-        if ($this->attachTo) {
-            call_user_func($this->attachTo . '::attachSchema', $schema);
-        }
-
-        return $schema;
+        return $this->generateSchemaArray();
     }
+
+
+
+    /**
+     * Accepts a condition where to show this schema
+     *
+     * @param  Condition  $condition
+     *
+     * @return $this
+     */
+    public function shown(Condition $condition): CreateSchema
+    {
+        $this->location = $condition->generate();
+
+        return $this;
+    }
+
+
+
+    /**
+     * Sets the field styles
+     *
+     * @param  string  $style
+     *
+     * @return $this
+     */
+    public function style(string $style): CreateSchema
+    {
+        $this->style = $style;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Add a single field
+     *
+     * @param  Field  $field
+     *
+     * @return $this
+     */
+    public function withField(Field $field): CreateSchema
+    {
+        $this->fields[] = $field;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Field definitions. Required.
+     *
+     * @param  Field[]  $fields
+     *
+     * @return $this
+     */
+    public function withFields(array $fields): CreateSchema
+    {
+        $this->fields = array_merge($this->fields, $fields);
+
+        return $this;
+    }
+
 
 
     /**
@@ -176,6 +317,7 @@ class CreateSchema
     }
 
 
+
     /**
      * Recursive function to parse sub_fields looking for $name
      *
@@ -202,178 +344,41 @@ class CreateSchema
     }
 
 
-    /**
-     * An Array of Wordpress elements to hide on Screen
-     * 'permalink',
-     * 'the_content',
-     * 'excerpt',
-     * 'discussion',
-     * 'comments',
-     * 'revisions',
-     * 'slug',
-     * 'author',
-     * 'format',
-     * 'page_attributes',
-     * 'featured_image',
-     * 'categories',
-     * 'tags',
-     * 'send-trackbacks',
-     *
-     * @param array $hide_on_screen
-     *
-     * @return $this
-     */
-    public function hideOnScreen(array $hide_on_screen)
-    {
-        $this->hide_on_screen = $hide_on_screen;
-
-        return $this;
-    }
-
 
     /**
-     * Instruction Placement
-     *
-     * @param string $instruction_placement
-     *
-     * @return $this
-     */
-    public function instructionPlacement(string $instruction_placement)
-    {
-        $this->instruction_placement = $instruction_placement;
-
-        return $this;
-    }
-
-
-    /**
-     * label placement
-     *
-     * @param string $label_placement
-     *
-     * @return $this
-     */
-    public function labelPlacement(string $label_placement)
-    {
-        $this->label_placement = $label_placement;
-
-        return $this;
-    }
-
-
-    /**
-     * Menu Order
-     *
-     * @param int $menuOrder
-     *
-     * @return $this
-     */
-    public function menuOrder(int $menuOrder)
-    {
-        $this->menu_order = $menuOrder;
-
-        return $this;
-    }
-
-
-    /**
-     * position
-     *
-     * @param string $position
-     *
-     * @return $this
-     */
-    public function position(string $position)
-    {
-        $this->position = $position;
-
-        return $this;
-    }
-
-
-    /**
-     * Generate and register the schema with ACF
-     *
-     * @param int $sequence
-     */
-    function register($sequence = 20)
-    {
-        HookInto::action('init', $sequence)
-            ->run(function () {
-                $schema = $this->return();
-                acf_add_local_field_group($schema);
-            });
-    }
-
-
-    /**
-     * Generate the Schema Array
+     * Create the schema for ACF, and attach if necessary.
      *
      * @return array
      */
-    function return()
+    protected function generateSchemaArray(): array
     {
-        return $this->generateSchemaArray();
-    }
+        $fields = [];
+        foreach ($this->fields as $field) {
+            $fields[] = $field->generate(sanitize_title($this->title));
+        }
 
+        foreach ($fields as &$field) {
+            $field = $this->convertNameToKey($field, $fields);
+        }
 
-    /**
-     * Accepts a condition where to show this schema
-     *
-     * @param Condition $condition
-     *
-     * @return $this
-     */
-    public function shown(Condition $condition)
-    {
-        $this->location = $condition->generate();
+        $schema = [
+            'key'                   => $this->key,
+            'title'                 => $this->title,
+            'menu_order'            => $this->menu_order,
+            'fields'                => $fields,
+            'location'              => $this->location,
+            'position'              => $this->position,
+            'style'                 => $this->style,
+            'label_placement'       => $this->label_placement,
+            'instruction_placement' => $this->instruction_placement,
+            'hide_on_screen'        => $this->hide_on_screen,
+        ];
 
-        return $this;
-    }
+        if ($this->attachTo) {
+            call_user_func($this->attachTo.'::attachSchema', $schema);
+        }
 
-
-    /**
-     * Sets the field styles
-     *
-     * @param string $style
-     *
-     * @return $this
-     */
-    public function style(string $style)
-    {
-        $this->style = $style;
-
-        return $this;
-    }
-
-
-    /**
-     * Add a single field
-     *
-     * @param array $fields
-     *
-     * @return $this
-     */
-    public function withField(Field $field)
-    {
-        $this->fields[] = $field;
-
-        return $this;
-    }
-
-
-    /**
-     * Field definitions. Required.
-     *
-     * @param array $fields
-     *
-     * @return $this
-     */
-    public function withFields(array $fields)
-    {
-        $this->fields = array_merge($this->fields, $fields);
-
-        return $this;
+        return $schema;
     }
 
 }

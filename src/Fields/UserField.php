@@ -7,46 +7,51 @@ use GeniePress\Abstracts\Field;
 class UserField extends Field
 {
 
-
-    /**
-     * Limit to Wordpress Role
-     *
-     * @param string $role
-     *
-     * @return $this
-     */
-    public function role(string $role)
-    {
-        return $this->set('role', $role);
-    }
-
-
     /**
      * Allow no value to be selected
      *
-     * @param $allowNull
+     * @param  bool  $allowNull
      *
      * @return $this
      */
-    public function allowNull(bool $allowNull)
+    public function allowNull(bool $allowNull): UserField
     {
         return $this->set('allow_null', $allowNull);
     }
 
 
+
     /**
      * Allow multiple values to be selected
      *
-     * @param bool $multiple
+     * @param  bool  $multiple
      *
      * @return $this
      */
-    public function multiple(bool $multiple)
+    public function multiple(bool $multiple): UserField
     {
         return $this->set('multiple', $multiple);
     }
 
 
+
+    /**
+     * Limit to Wordpress Role
+     *
+     * @param  string  $role
+     *
+     * @return $this
+     */
+    public function role(string $role): UserField
+    {
+        return $this->set('role', $role);
+    }
+
+
+
+    /**
+     * Set Defaults
+     */
     protected function setDefaults()
     {
         parent::setDefaults();

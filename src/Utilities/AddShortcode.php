@@ -2,11 +2,9 @@
 
 namespace GeniePress\Utilities;
 
-
 class AddShortcode
 
 {
-
 
     /**
      * the name of the shortcode
@@ -16,10 +14,11 @@ class AddShortcode
     protected $shortcode;
 
 
+
     /**
      * constructor.
      *
-     * @param string $shortcode
+     * @param  string  $shortcode
      */
     public function __construct(string $shortcode)
     {
@@ -27,24 +26,26 @@ class AddShortcode
     }
 
 
+
     /**
      * Static constructor
      *
-     * @param $shortcode
+     * @param  string  $shortcode
      *
      * @return static
      */
 
-    public static function called(string $shortcode)
+    public static function called(string $shortcode): AddShortcode
     {
         return new static($shortcode);
     }
 
 
+
     /**
      * Set the callback and register the actions and filters
      *
-     * @param callable $callback
+     * @param  callable  $callback
      */
     public function run(callable $callback)
     {

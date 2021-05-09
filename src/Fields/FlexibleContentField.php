@@ -7,7 +7,6 @@ use GeniePress\Abstracts\Field;
 class FlexibleContentField extends Field
 {
 
-
     /**
      * Sets a label for the add Button
      *
@@ -15,51 +14,58 @@ class FlexibleContentField extends Field
      *
      * @return $this
      */
-    public function buttonLabel($label)
+    public function buttonLabel($label): FlexibleContentField
     {
         return $this->set('button_label', $label);
     }
 
 
+
     /**
      * Specify the maximum posts allowed to be selected. Defaults to 0
      *
-     * @param int $number
+     * @param  int  $number
      *
      * @return $this
      */
-    public function max(int $number)
+    public function max(int $number): FlexibleContentField
     {
         return $this->set('max', $number);
     }
 
 
+
     /**
      * Specify the minimum posts required to be selected. Defaults to 0
      *
-     * @param int $number
+     * @param  int  $number
      *
      * @return $this
      */
-    public function min(int $number)
+    public function min(int $number): FlexibleContentField
     {
         return $this->set('min', $number);
     }
 
 
+
     /**
      * Add Fields
      *
-     * @param array $fields
+     * @param  array  $fields
      *
      * @return $this
      */
-    public function withLayouts(array $fields)
+    public function withLayouts(array $fields): FlexibleContentField
     {
         return $this->set('layouts', $fields);
     }
 
 
+
+    /**
+     * Set Defaults
+     */
     protected function setDefaults()
     {
         parent::setDefaults();

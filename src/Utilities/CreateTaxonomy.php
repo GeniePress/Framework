@@ -11,14 +11,12 @@ namespace GeniePress\Utilities;
 class CreateTaxonomy
 {
 
-
     /**
      * Objects to attach this taxonomy to
      *
      * @var array
      */
     protected $attachTo = [];
-
 
     /**
      * see https://codex.wordpress.org/Function_Reference/register_taxonomy
@@ -65,7 +63,6 @@ class CreateTaxonomy
 
     ];
 
-
     /**
      * Taxonomy slug
      *
@@ -74,10 +71,11 @@ class CreateTaxonomy
     protected $taxonomy;
 
 
+
     /**
      * CreateCustomPostType constructor.
      *
-     * @param string $name Name
+     * @param  string  $name  Name
      */
     public function __construct($name)
     {
@@ -85,60 +83,35 @@ class CreateTaxonomy
 
         $this->taxonomy = $string->toSingular()->toSnakeCase();
 
-        $singular = (string)$string->toTitleCase()->toSingular();
-        $plural = (string)$string->toPlural();
+        $singular = (string) $string->toTitleCase()->toSingular();
+        $plural   = (string) $string->toPlural();
 
         $this->setLabels([
 
             'name'                       => $plural,
             'singular_name'              => $singular,
             'menu_name'                  => $plural,
-            'all_items'                  => 'All ' . $plural,
-            'edit_item'                  => 'Edit ' . $singular,
-            'view_item'                  => 'View ' . $singular,
-            'update_item'                => 'Update ' . $singular,
-            'add_new_item'               => 'Add New ' . $singular,
-            'new_item_name'              => 'New ' . $singular . ' Name',
-            'parent_item'                => 'Parent ' . $singular,
-            'parent_item_colon'          => 'Parent ' . $singular . ':',
-            'search_items'               => 'Search ' . $plural,
-            'popular_items'              => 'Popular ' . $plural,
-            'separate_items_with_commas' => 'Separate ' . $plural . ' with commas',
-            'add_or_remove_items'        => 'Add or remove ' . $plural,
-            'choose_from_most_used'      => 'Choose from the most used ' . $plural,
-            'not_found'                  => 'No ' . $plural . ' found',
-            'back_to_items'              => '← Back to ' . $plural,
+            'all_items'                  => 'All '.$plural,
+            'edit_item'                  => 'Edit '.$singular,
+            'view_item'                  => 'View '.$singular,
+            'update_item'                => 'Update '.$singular,
+            'add_new_item'               => 'Add New '.$singular,
+            'new_item_name'              => 'New '.$singular.' Name',
+            'parent_item'                => 'Parent '.$singular,
+            'parent_item_colon'          => 'Parent '.$singular.':',
+            'search_items'               => 'Search '.$plural,
+            'popular_items'              => 'Popular '.$plural,
+            'separate_items_with_commas' => 'Separate '.$plural.' with commas',
+            'add_or_remove_items'        => 'Add or remove '.$plural,
+            'choose_from_most_used'      => 'Choose from the most used '.$plural,
+            'not_found'                  => 'No '.$plural.' found',
+            'back_to_items'              => '← Back to '.$plural,
         ]);
 
         $this->set('label', $plural);
         $this->set('description', $name);
     }
 
-
-    function setLabels(array $labels)
-    {
-        foreach ($labels as $label => $value) {
-            $this->setLabel($label, $value);
-        }
-
-        return $this;
-    }
-
-
-    function setLabel($label, $name)
-    {
-        $this->definition['labels'][$label] = $name;
-
-        return $this;
-    }
-
-
-    function set($attribute, $value)
-    {
-        $this->definition[$attribute] = $value;
-
-        return $this;
-    }
 
 
     /**
@@ -148,13 +121,21 @@ class CreateTaxonomy
      *
      * @return CreateTaxonomy
      */
-    public static function called($name)
+    public static function called($name): CreateTaxonomy
     {
         return new static($name);
     }
 
 
-    public function attachTo($object)
+
+    /**
+     * Attach to a post type
+     *
+     * @param $object
+     *
+     * @return $this
+     */
+    public function attachTo($object): CreateTaxonomy
     {
         $this->attachTo[] = $object;
 
@@ -162,12 +143,13 @@ class CreateTaxonomy
     }
 
 
+
     /**
      * Sets this taxonomy as being hidden
      *
      * @return $this
      */
-    function hidden()
+    function hidden(): CreateTaxonomy
     {
         $this->set('show_ui', false);
         $this->set('show_in_nav_menus', false);
@@ -176,10 +158,11 @@ class CreateTaxonomy
     }
 
 
+
     /**
      * Register the Taxonomy
      *
-     * @param int $sequence
+     * @param  int  $sequence
      */
     function register($sequence = 20)
     {
@@ -189,6 +172,58 @@ class CreateTaxonomy
 
                 register_taxonomy($this->taxonomy, $attachTo, $this->definition);
             });
+    }
+
+
+
+    /**
+     * Set a property
+     *
+     * @param $attribute
+     * @param $value
+     *
+     * @return $this
+     */
+    function set($attribute, $value): CreateTaxonomy
+    {
+        $this->definition[$attribute] = $value;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Set a label
+     *
+     * @param $label
+     * @param $name
+     *
+     * @return $this
+     */
+    function setLabel($label, $name): CreateTaxonomy
+    {
+        $this->definition['labels'][$label] = $name;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Set labels
+     *
+     * @param  array  $labels
+     *
+     * @return $this
+     */
+    function setLabels(array $labels): CreateTaxonomy
+    {
+        foreach ($labels as $label => $value) {
+            $this->setLabel($label, $value);
+        }
+
+        return $this;
     }
 
 }

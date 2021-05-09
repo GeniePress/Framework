@@ -5,6 +5,8 @@ namespace GeniePress;
 use GeniePress\Interfaces\GenieComponent;
 use GeniePress\Utilities\HookInto;
 use Throwable;
+use Twig\Environment;
+use Twig\TwigFunction;
 
 /**
  * Class ApiHandler
@@ -14,7 +16,6 @@ use Throwable;
 class ApiHandler implements GenieComponent
 {
 
-
     /**
      * An array of paths to use for ajax calls
      *
@@ -23,38 +24,38 @@ class ApiHandler implements GenieComponent
     protected static $routes = [];
 
 
+
     /**
      * Setup Actions, Filters and Shortcodes
      */
     public static function setup()
     {
-
         /**
          * Handle the ajax call.
          */
         HookInto::action('init')
             ->run(function () {
-                $path = apply_filters('genie_api_path', 'api');
-                $action = apply_filters('genie_api_action', 'genie_api');
-                add_rewrite_rule($path . '/(.*)$', 'wp-admin/admin-ajax.php?action=' . $action . '&route=$1', 'top');
+                $path   = apply_filters('genie_api_path', Registry::get('genie_api_path'));
+                $action = apply_filters('genie_api_action', Registry::get('genie_api_action'));
 
-                HookInto::action('wp_ajax_' . $action)
-                    ->orAction('wp_ajax_nopriv_' . $action)
+                add_rewrite_rule($path.'/(.*)$', 'wp-admin/admin-ajax.php?action='.$action.'&route=$1', 'top');
+
+                HookInto::action('wp_ajax_'.$action)
+                    ->orAction('wp_ajax_nopriv_'.$action)
                     ->run(function () use ($action) {
-
                         Request::maybeParseInput();
 
                         do_action('genie_received_api_request', $action, Request::getData());
 
                         $route = Request::get('route');
 
-                        if (!$route) {
+                        if ( ! $route) {
                             Response::error([
                                 'message' => "No request specified",
                             ]);
                         }
 
-                        if (!static::canHandle($route)) {
+                        if ( ! static::canHandle($route)) {
                             Response::notFound([
                                 'message' => "Request: {$route} not found",
                             ]);
@@ -62,11 +63,11 @@ class ApiHandler implements GenieComponent
 
                         // The Callback exists
                         $callback = static::$routes[$route]->callback;
-                        $method = static::$routes[$route]->method;
+                        $method   = static::$routes[$route]->method;
 
                         if ($method !== Request::method()) {
                             Response::error([
-                                'message' => "This route does not support " . Request::method() . " requests",
+                                'message' => "This route does not support ".Request::method()." requests",
                             ]);
                         }
 
@@ -83,26 +84,22 @@ class ApiHandler implements GenieComponent
                                 'message'             => "Invalid json received",
                                 'json_last_error'     => json_last_error(),
                                 'json_last_error_msg' => json_last_error_msg(),
-
                             ]);
                         }
 
                         try {
-
                             $callbackParams = [];
 
                             foreach ($params as $param) {
                                 $name = $param->getName();
-                                if (!$param->isOptional() && !Request::has($name)) {
+                                if ( ! $param->isOptional() && ! Request::has($name)) {
                                     Response::failure(['message' => "required parameter {$name} is missing"]);
                                 }
                                 $callbackParams[$name] = Request::get($name);
                             }
 
                             Response::success(call_user_func_array($callback, $callbackParams));
-
                         } catch (Throwable $error) {
-
                             $response = [
                                 'message' => $error->getMessage(),
                             ];
@@ -119,7 +116,18 @@ class ApiHandler implements GenieComponent
                     });
             });
 
+        /**
+         * Create the api_url function in twig that can prefix the right path, and add the nonce.
+         */
+        HookInto::filter('genie_view_twig')
+            ->run(function (Environment $twig) {
+                $function = new TwigFunction('api_url', [static::class, 'generateUrl']);
+                $twig->addFunction($function);
+
+                return $twig;
+            });
     }
+
 
 
     /**
@@ -129,22 +137,39 @@ class ApiHandler implements GenieComponent
      *
      * @return bool
      */
-    public static function canHandle($route)
+    public static function canHandle($route): bool
     {
         return array_key_exists($route, static::$routes);
     }
 
 
+
+    /**
+     * Generate a url for an api call with the $requestPath
+     *
+     * @param $route
+     *
+     * @return string
+     */
+    public static function generateUrl($route): string
+    {
+        $path = apply_filters('genie_api_path', Registry::get('genie_api_path'));
+
+        return home_url($path.'/'.$route);
+    }
+
+
+
     /**
      * Register an ajax callback function
      *
-     * @param string $path
-     * @param string $method
-     * @param callable $callback
+     * @param  string  $route
+     * @param  string  $method
+     * @param  callable  $callback
      */
-    public static function register(string $path, string $method, callable $callback)
+    public static function register(string $route, string $method, callable $callback)
     {
-        static::$routes[$path] = (object)[
+        static::$routes[$route] = (object) [
             'method'   => strtoupper(trim($method)),
             'callback' => $callback,
         ];

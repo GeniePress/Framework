@@ -5,9 +5,7 @@ namespace GeniePress\Utilities;
 use GeniePress\ApiHandler;
 
 class RegisterApi
-
 {
-
 
     /**
      * the url of the api call
@@ -15,7 +13,6 @@ class RegisterApi
      * @var array
      */
     protected $url;
-
 
     /**
      * The accepted Method
@@ -25,31 +22,20 @@ class RegisterApi
     protected $method = 'GET';
 
 
+
     /**
      * constructor.
      *
-     * @param string $url
-     * @param string $method
+     * @param  string  $url
+     * @param  string  $method
      */
-    public function __construct(string $url, $method = 'GET')
+    public function __construct(string $url, string $method = 'GET')
     {
-        $this->url = $url;
+        $this->url    = $url;
         $this->method = $method;
     }
 
 
-    /**
-     * static constructor
-     *
-     * @param $url
-     *
-     * @return static
-     */
-    public static function get($url)
-    {
-        return new static($url, 'GET');
-    }
-
 
     /**
      * static constructor
@@ -58,38 +44,13 @@ class RegisterApi
      *
      * @return static
      */
-    public static function post($url)
-    {
-        return new static($url, 'POST');
-    }
-
-
-    /**
-     * static constructor
-     *
-     * @param $url
-     *
-     * @return static
-     */
-    public static function put($url)
-    {
-        return new static($url, 'PUT');
-    }
-
-
-    /**
-     * static constructor
-     *
-     * @param $url
-     *
-     * @return static
-     */
-    public static function delete($url)
+    public static function delete($url): RegisterApi
     {
         return new static($url, 'DELETE');
     }
 
 
+
     /**
      * static constructor
      *
@@ -97,16 +58,59 @@ class RegisterApi
      *
      * @return static
      */
-    public static function patch($url)
+    public static function get($url): RegisterApi
+    {
+        return new static($url, 'GET');
+    }
+
+
+
+    /**
+     * static constructor
+     *
+     * @param $url
+     *
+     * @return static
+     */
+    public static function patch($url): RegisterApi
     {
         return new static($url, 'PATCH');
     }
 
 
+
+    /**
+     * static constructor
+     *
+     * @param $url
+     *
+     * @return static
+     */
+    public static function post($url): RegisterApi
+    {
+        return new static($url, 'POST');
+    }
+
+
+
+    /**
+     * static constructor
+     *
+     * @param $url
+     *
+     * @return static
+     */
+    public static function put($url): RegisterApi
+    {
+        return new static($url, 'PUT');
+    }
+
+
+
     /**
      * Set the callback and register the actions and filters
      *
-     * @param callable $callback
+     * @param  callable  $callback
      */
     public function run(callable $callback)
     {

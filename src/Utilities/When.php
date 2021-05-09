@@ -7,5 +7,4 @@ use GeniePress\Abstracts\Condition;
 class When extends Condition
 {
 
-
 }

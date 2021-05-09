@@ -2,7 +2,6 @@
 
 namespace GeniePress;
 
-
 use GeniePress\Interfaces\GenieComponent;
 use GeniePress\Utilities\HookInto;
 use WP;
@@ -15,15 +14,6 @@ use WP;
  */
 class WordPress implements GenieComponent
 {
-
-
-    /**
-     * Query Variables
-     *
-     * @var array
-     */
-    protected static $query_vars;
-
 
     /**
      * a list of wordpress fields
@@ -56,6 +46,14 @@ class WordPress implements GenieComponent
         'comment_count',
     ];
 
+    /**
+     * Query Variables
+     *
+     * @var array
+     */
+    protected static $query_vars;
+
+
 
     /**
      * Constructor
@@ -74,6 +72,5 @@ class WordPress implements GenieComponent
                 return array_merge($vars, ['query_vars' => static::$query_vars]);
             });
     }
-
 
 }

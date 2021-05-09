@@ -5,7 +5,9 @@ namespace GeniePress\Fields;
 class DateTimeField extends DateField
 {
 
-
+    /**
+     * Set defaults
+     */
     protected function setDefaults()
     {
         parent::setDefaults();

@@ -2,34 +2,30 @@
 
 namespace GeniePress\Utilities;
 
-
 use GeniePress\AjaxHandler;
 
 class RegisterAjax
-
 {
 
-
     /**
-     * the url of the ajax call
+     * The url of the ajax call
      *
      * @var array
      */
     protected $url;
 
 
-    protected $nonce = '';
-
 
     /**
      * constructor.
      *
-     * @param string $url
+     * @param  string  $url
      */
     public function __construct(string $url)
     {
         $this->url = $url;
     }
+
 
 
     /**
@@ -39,21 +35,21 @@ class RegisterAjax
      *
      * @return static
      */
-    public static function url($url)
+    public static function url($url): RegisterAjax
     {
         return new static($url);
     }
 
 
+
     /**
      * Set the callback and register the actions and filters
      *
-     * @param callable $callback
+     * @param  callable  $callback
      */
     public function run(callable $callback)
     {
         AjaxHandler::register($this->url, $callback);
     }
-
 
 }
