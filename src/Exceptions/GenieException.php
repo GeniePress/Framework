@@ -3,8 +3,8 @@
 namespace GeniePress\Exceptions;
 
 use Exception;
-use JsonSerializable;
 use GeniePress\Traits\HasData;
+use JsonSerializable;
 use Throwable;
 
 /**
@@ -17,14 +17,21 @@ use Throwable;
 class GenieException extends Exception implements JsonSerializable
 {
 
-
     use HasData;
 
-    function __construct($message = "", $code = 0, Throwable $previous = null)
+    /**
+     * GenieException constructor.
+     *
+     * @param  string  $message
+     * @param  int  $code
+     * @param  Throwable|null  $previous
+     */
+    function __construct($message = '', $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
         do_action('genie_exception', $this);
     }
+
 
 
     /**
@@ -34,10 +41,27 @@ class GenieException extends Exception implements JsonSerializable
      *
      * @return static
      */
-    public static function withMessage($message)
+    public static function withMessage($message): GenieException
     {
         return new static($message);
     }
+
+
+
+    /**
+     * Return the exception as a json object
+     *
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'message' => $this->getMessage(),
+            'code'    => $this->getCode(),
+            'data'    => $this->getData(),
+        ];
+    }
+
 
 
     /**
@@ -47,11 +71,13 @@ class GenieException extends Exception implements JsonSerializable
      *
      * @return $this
      */
-    public function withCode($code)
+    public function withCode($code): GenieException
     {
         $this->code = $code;
+
         return $this;
     }
+
 
 
     /**
@@ -61,19 +87,10 @@ class GenieException extends Exception implements JsonSerializable
      *
      * @return $this
      */
-    public function withData($data)
+    public function withData($data): GenieException
     {
         $this->data = $data;
+
         return $this;
-    }
-
-
-    public function jsonSerialize()
-    {
-        return [
-            'message' => $this->getMessage(),
-            'code'    => $this->getCode(),
-            'data'    => $this->getData(),
-        ];
     }
 }

@@ -11,7 +11,6 @@ namespace GeniePress\Abstracts;
 abstract class Condition
 {
 
-
     /**
      * field name
      *
@@ -19,65 +18,65 @@ abstract class Condition
      */
     protected $fieldName = 'field';
 
-
     /**
-     * An Array of conditions
+     * An array of conditions
      *
      * @var array
      */
-    private $conditions = [];
-
+    protected $conditions = [];
 
     /**
      * Parse conditions into groups
      *
      * @var array
      */
-    private $group = [];
-
+    protected $group = [];
 
     /**
      * The current field.
      *
      * @var string|null
      */
-    private $field = '';
+    protected $field = '';
+
 
 
     /**
      * constructor.
      *
-     * @param null $field
+     * @param  string|null  $field
      */
-    public function __construct($field = null)
+    public function __construct(string $field = null)
     {
-        if (!is_null($field)) {
+        if ( ! is_null($field)) {
             $this->field = $field;
         }
     }
 
 
+
     /**
      * Static Constructor
      *
-     * @param $field
+     * @param  string  $field
      *
      * @return Condition
      */
-    public static function field($field)
+    public static function field(string $field): Condition
     {
         return new static($field);
     }
 
 
+
     /**
      * Start a new group with an And clause
      *
-     * @param $field
+     * @param  string  $field
      *
-     * @return $this
+     * @return Condition
      */
-    public function and($field)
+    public function and(string $field): Condition
     {
         $this->field = $field;
 
@@ -85,14 +84,15 @@ abstract class Condition
     }
 
 
+
     /**
      * Check the field contains
      *
      * @param $value
      *
-     * @return $this
+     * @return Condition
      */
-    public function contains($value)
+    public function contains($value): Condition
     {
         $this->group[] = [
             $this->fieldName => $this->field,
@@ -105,12 +105,13 @@ abstract class Condition
     }
 
 
+
     /**
      * Check the field is empty
      *
-     * @return $this
+     * @return Condition
      */
-    public function empty()
+    public function empty(): Condition
     {
         $this->group[] = [
             $this->fieldName => $this->field,
@@ -122,14 +123,15 @@ abstract class Condition
     }
 
 
+
     /**
      * Check the field equals
      *
      * @param $value
      *
-     * @return $this
+     * @return Condition
      */
-    public function equals($value)
+    public function equals($value): Condition
     {
         $this->group[] = [
             $this->fieldName => $this->field,
@@ -141,13 +143,14 @@ abstract class Condition
     }
 
 
+
     /**
      * Generate the array condition
      *
      * @return array
      */
 
-    public function generate()
+    public function generate(): array
     {
         if (count($this->group) > 0) {
             $this->conditions[] = $this->group;
@@ -157,14 +160,15 @@ abstract class Condition
     }
 
 
+
     /**
      * check the field matches
      *
      * @param $pattern
      *
-     * @return $this
+     * @return Condition
      */
-    public function matches($pattern)
+    public function matches($pattern): Condition
     {
         $this->group[] = [
             $this->fieldName => $this->field,
@@ -177,12 +181,13 @@ abstract class Condition
     }
 
 
+
     /**
      * Check the field is not empty
      *
-     * @return $this
+     * @return Condition
      */
-    public function notEmpty()
+    public function notEmpty(): Condition
     {
         $this->group[] = [
             $this->fieldName => $this->field,
@@ -194,14 +199,15 @@ abstract class Condition
     }
 
 
+
     /**
      * Check the field is not equal to
      *
      * @param $value
      *
-     * @return $this
+     * @return Condition
      */
-    public function notEquals($value)
+    public function notEquals($value): Condition
     {
         $this->group[] = [
             $this->fieldName => $this->field,
@@ -213,18 +219,19 @@ abstract class Condition
     }
 
 
+
     /**
      * Start a new OR group
      *
      * @param $field
      *
-     * @return $this
+     * @return Condition
      */
-    public function or($field)
+    public function or($field): Condition
     {
-        $this->field = $field;
+        $this->field        = $field;
         $this->conditions[] = $this->group;
-        $this->group = [];
+        $this->group        = [];
 
         return $this;
     }

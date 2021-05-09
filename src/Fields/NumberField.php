@@ -5,46 +5,51 @@ namespace GeniePress\Fields;
 class NumberField extends TextField
 {
 
-
-    /**
-     * Minimum value for this field
-     *
-     * @param $min
-     *
-     * @return $this
-     */
-    public function min(int $min)
-    {
-        return $this->set('min', $min);
-    }
-
-
     /**
      * Maximum value for this field
      *
-     * @param int $max
+     * @param  int  $max
      *
      * @return $this
      */
-    public function max(int $max)
+    public function max(int $max): NumberField
     {
         return $this->set('max', $max);
     }
 
 
+
     /**
-     * Increment Step
+     * Minimum value for this field
      *
-     * @param int $step
+     * @param  int  $min
      *
      * @return $this
      */
-    public function step(int $step)
+    public function min(int $min): NumberField
+    {
+        return $this->set('min', $min);
+    }
+
+
+
+    /**
+     * Increment Step
+     *
+     * @param  int  $step
+     *
+     * @return $this
+     */
+    public function step(int $step): NumberField
     {
         return $this->set('step', $step);
     }
 
 
+
+    /**
+     * Set Defaults
+     */
     protected function setDefaults()
     {
         parent::setDefaults();

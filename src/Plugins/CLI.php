@@ -2,11 +2,11 @@
 
 namespace GeniePress\Plugins;
 
-class ACF
+class CLI
 {
 
     /**
-     * Check if ACF is disabled
+     * Check if WordPress CLI is disabled
      *
      * @return bool
      */
@@ -18,13 +18,13 @@ class ACF
 
 
     /**
-     * Check if ACF is enabled
+     * Check if WordPress CLI is enabled
      *
      * @return bool
      */
     public static function isEnabled(): bool
     {
-        return function_exists('get_field');
+        return defined('WP_CLI') && WP_CLI;
     }
 
 }

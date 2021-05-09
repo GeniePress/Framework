@@ -9,18 +9,17 @@ namespace GeniePress;
 class Config
 {
 
-
     /**
      * Get a config value
      *
-     * @param string $value
-     * @param bool $default
+     * @param  string  $value
+     * @param  mixed  $default
      *
      * @return bool|mixed
      */
     public static function get(string $value, $default = false)
     {
-        if (!defined($value)) {
+        if ( ! defined($value)) {
             return $default;
         }
 

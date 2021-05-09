@@ -19,7 +19,6 @@ use InlineStyle\InlineStyle;
 class SendEmail
 {
 
-
     /**
      * To email address
      *
@@ -27,14 +26,12 @@ class SendEmail
      */
     protected $email;
 
-
     /**
-     * The name of the person reciving the email
+     * The name of the person receiving the email
      *
      * @var string
      */
     protected $name;
-
 
     /**
      * The subject
@@ -43,16 +40,14 @@ class SendEmail
      */
     protected $subject;
 
-
     /**
-     * Additional headers to send with th eemail
+     * Additional headers to send with the email
      *
      * @protected string[]
      */
     protected $headers = [
         'Content-Type: text/html; charset=UTF-8',
     ];
-
 
     /**
      * The email body (HTML)
@@ -61,14 +56,12 @@ class SendEmail
      */
     protected $body = '';
 
-
     /**
      * A list of attachments
      *
      * @var array
      */
     protected $attachments = [];
-
 
     /**
      * Should CSS Styles be inlined?
@@ -78,46 +71,19 @@ class SendEmail
     protected $inlineStyles = true;
 
 
+
     /**
      * SendEmail constructor.
      *
-     * @param $email
-     * @param string $name
+     * @param  string  $email
+     * @param  string  $name
      */
-    public function __construct($email, $name = '')
+    public function __construct(string $email, string $name = '')
     {
         $this->email($email);
         $this->name($name);
     }
 
-
-    /**
-     * Sets the email of the recipient
-     *
-     * @param $email
-     *
-     * @return $this
-     */
-    function email($email)
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-
-    /**
-     * Sets the name of the email recipient
-     *
-     * @param $name
-     *
-     * @return $this
-     */
-    function name($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
 
 
     /**
@@ -127,42 +93,16 @@ class SendEmail
      * ->subject('....')
      * ->send()
      *
-     * @param string|array $email
-     * @param string $name
+     * @param  string|array  $email
+     * @param  string  $name
      *
      * @return static
      */
-    public static function to($email, string $name = '')
+    public static function to($email, string $name = ''): SendEmail
     {
         return new static($email, $name = '');
     }
 
-
-    /**
-     * Sets the sender of the email
-     *
-     * @param string $email
-     * @param string $name
-     *
-     * @return $this
-     */
-    function from(string $email, string $name = '')
-    {
-        $this->addHeader("From: $name <{$email}>");
-
-        return $this;
-    }
-
-
-    /**
-     * Adds a header to the email
-     *
-     * @param string $header
-     */
-    function addHeader(string $header)
-    {
-        $this->headers[] = $header;
-    }
 
 
     /**
@@ -172,7 +112,7 @@ class SendEmail
      *
      * @return $this
      */
-    public function addAttachment($file)
+    public function addAttachment($file): SendEmail
     {
         $this->attachments[] = $file;
 
@@ -180,14 +120,27 @@ class SendEmail
     }
 
 
+
+    /**
+     * Adds a header to the email
+     *
+     * @param  string  $header
+     */
+    function addHeader(string $header)
+    {
+        $this->headers[] = $header;
+    }
+
+
+
     /**
      * Sets the body of the email
      *
-     * @param string $body
+     * @param  string  $body
      *
      * @return $this
      */
-    function body(string $body)
+    function body(string $body): SendEmail
     {
         $this->body = $body;
 
@@ -195,15 +148,21 @@ class SendEmail
     }
 
 
+
     /**
-     * Send the email using wp_mail
+     * Sets the email of the recipient
      *
-     * @return bool
+     * @param $email
+     *
+     * @return $this
      */
-    function send()
+    function email($email): SendEmail
     {
-        return wp_mail($this->email, $this->subject, $this->format(), $this->headers, $this->attachments);
+        $this->email = $email;
+
+        return $this;
     }
+
 
 
     /**
@@ -211,9 +170,9 @@ class SendEmail
      *
      * @return string
      */
-    function format()
+    function format(): string
     {
-        if (!$this->inlineStyles) {
+        if ( ! $this->inlineStyles) {
             return $this->body;
         }
 
@@ -224,14 +183,32 @@ class SendEmail
     }
 
 
+
     /**
-     * Run the inline styler?
+     * Sets the sender of the email
      *
-     * @param $bool
+     * @param  string  $email
+     * @param  string  $name
      *
      * @return $this
      */
-    function inlineStyles($bool)
+    function from(string $email, string $name = ''): SendEmail
+    {
+        $this->addHeader("From: $name <{$email}>");
+
+        return $this;
+    }
+
+
+
+    /**
+     * Run the inline styler?
+     *
+     * @param  bool  $bool
+     *
+     * @return $this
+     */
+    function inlineStyles(bool $bool): SendEmail
     {
         $this->inlineStyles = $bool;
 
@@ -239,14 +216,43 @@ class SendEmail
     }
 
 
+
     /**
-     * Sets the subject of the email
+     * Sets the name of the email recipient
      *
-     * @param $subject
+     * @param $name
      *
      * @return $this
      */
-    function subject($subject)
+    function name($name): SendEmail
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Send the email using wp_mail
+     *
+     * @return bool
+     */
+    function send(): bool
+    {
+        return wp_mail($this->email, $this->subject, $this->format(), $this->headers, $this->attachments);
+    }
+
+
+
+    /**
+     * Sets the subject of the email
+     *
+     * @param  string  $subject
+     *
+     * @return $this
+     */
+    function subject(string $subject): SendEmail
     {
         $this->subject = $subject;
 

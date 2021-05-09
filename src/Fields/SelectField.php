@@ -7,54 +7,18 @@ use GeniePress\Abstracts\Field;
 class SelectField extends Field
 {
 
-
-    /**
-     * Choices for this select dropdown
-     *
-     * @param array $choices key=> value paid
-     *
-     * @return $this
-     */
-    public function choices(array $choices)
-    {
-        return $this->set('choices', $choices);
-    }
-
-
     /**
      * Should the values be loaded by Ajax?
      *
-     * @param bool $ajax
+     * @param  bool  $ajax
      *
      * @return $this
      */
-    public function ajax(bool $ajax)
+    public function ajax(bool $ajax): SelectField
     {
         return $this->set('ajax', $ajax);
     }
 
-
-    /**
-     * select multiple values?
-     *
-     * @param bool $multiple
-     *
-     * @return $this
-     */
-    public function multiple(bool $multiple)
-    {
-        return $this->set('multiple', $multiple);
-    }
-
-
-    protected function setDefaults()
-    {
-        parent::setDefaults();
-        $this->type('select');
-        $this->allowNull(true);
-        $this->ui(true);
-        $this->returnFormat('array');
-    }
 
 
     /**
@@ -64,35 +28,79 @@ class SelectField extends Field
      *
      * @return $this
      */
-    public function allowNull($allowNull)
+    public function allowNull($allowNull): SelectField
     {
         return $this->set('allow_null', $allowNull);
     }
 
 
+
     /**
-     * use an improved UI ?
+     * Choices for this select dropdown
      *
-     * @param $ui
+     * @param  array  $choices  key=> value paid
      *
      * @return $this
      */
-    public function ui(bool $ui)
+    public function choices(array $choices): SelectField
     {
-        return $this->set('ui', $ui);
+        return $this->set('choices', $choices);
     }
+
+
+
+    /**
+     * select multiple values?
+     *
+     * @param  bool  $multiple
+     *
+     * @return $this
+     */
+    public function multiple(bool $multiple): SelectField
+    {
+        return $this->set('multiple', $multiple);
+    }
+
 
 
     /**
      * Return Format
      *
-     * @param $returnValue
+     * @param  string  $returnValue
      *
      * @return $this
      */
-    public function returnFormat(string $returnValue)
+    public function returnFormat(string $returnValue): SelectField
     {
         return $this->set('return_format', $returnValue);
+    }
+
+
+
+    /**
+     * use an improved UI ?
+     *
+     * @param  bool  $ui
+     *
+     * @return $this
+     */
+    public function ui(bool $ui): SelectField
+    {
+        return $this->set('ui', $ui);
+    }
+
+
+
+    /**
+     * Set Defaults
+     */
+    protected function setDefaults()
+    {
+        parent::setDefaults();
+        $this->type('select');
+        $this->allowNull(true);
+        $this->ui(true);
+        $this->returnFormat('array');
     }
 
 }

@@ -4,7 +4,6 @@ namespace GeniePress\Fields;
 
 use GeniePress\Abstracts\Field;
 
-
 /**
  * Class GroupField
  *
@@ -14,15 +13,28 @@ use GeniePress\Abstracts\Field;
 class GroupField extends Field
 {
 
+    /**
+     * layout
+     *
+     * @param  string  $layout  table|block|row
+     *
+     * @return $this
+     */
+    public function layout(string $layout): GroupField
+    {
+        return $this->set('layout', $layout);
+    }
+
+
 
     /**
      * Add Fields
      *
-     * @param array $fields
+     * @param  array  $fields
      *
      * @return $this
      */
-    public function withFields(array $fields)
+    public function withFields(array $fields): GroupField
     {
         $newFields = array_merge($this->sub_fields, $fields);
 
@@ -30,25 +42,16 @@ class GroupField extends Field
     }
 
 
+
+    /**
+     * Set Defaults
+     */
     protected function setDefaults()
     {
         parent::setDefaults();
         $this->type('group');
         $this->layout('row');
         $this->set('sub_fields', []);
-    }
-
-
-    /**
-     * layout
-     *
-     * @param string $layout table|block|row
-     *
-     * @return $this
-     */
-    public function layout(string $layout)
-    {
-        return $this->set('layout', $layout);
     }
 
 }

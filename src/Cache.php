@@ -10,28 +10,43 @@ namespace GeniePress;
 class Cache
 {
 
+    /**
+     * Clear any api call cache
+     */
+    public static function clearAPiCache()
+    {
+        global $wpdb;
+
+        $prefix = static::getCachePrefix();
+
+        // Delete api cache
+        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name like '%{$prefix}_api%'  ");
+    }
+
+
 
     /**
      * Clear Cache
      *
-     * @param int|array|null $id
+     * @param  int|array|null  $id
      */
-    public static function clearCache($id = null)
+    public static function clearPostCache($id = null)
     {
         global $wpdb;
 
         $where = '';
         if (is_array($id)) {
-            $where = 'and post_id in (' . implode(',', $id) . ')';
-        } else if (is_int($id)) {
-            $where = 'and post_id = ' . $id;
+            $where = 'and post_id in ('.implode(',', $id).')';
+        } elseif (is_int($id)) {
+            $where = 'and post_id = '.$id;
         }
 
         $prefix = static::getCachePrefix();
 
+        // Delete post cache
         $wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE meta_key LIKE '{$prefix}%'  $where ");
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name like '%{$prefix}_api%'  ");
     }
+
 
 
     /**
@@ -39,7 +54,7 @@ class Cache
      *
      * @return string
      */
-    public static function getCachePrefix()
+    public static function getCachePrefix(): string
     {
         return apply_filters('genie_get_cache_prefix', 'gcache');
     }

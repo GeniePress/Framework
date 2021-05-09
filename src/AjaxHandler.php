@@ -16,7 +16,6 @@ use Twig\TwigFunction;
 class AjaxHandler implements GenieComponent
 {
 
-
     /**
      * An array of paths to use for ajax calls
      *
@@ -24,13 +23,13 @@ class AjaxHandler implements GenieComponent
      */
     protected static $paths = [];
 
-
     /**
      * stash of the string to use for the action
      *
      * @var string
      */
     protected static $action;
+
 
 
     /**
@@ -43,25 +42,24 @@ class AjaxHandler implements GenieComponent
          */
         HookInto::action('init')
             ->run(function () {
-                $action = static::getAction();
+                $action = static::getActionName();
 
-                HookInto::action('wp_ajax_' . $action)
-                    ->orAction('wp_ajax_nopriv_' . $action)
-                    ->run(function ()  use ($action){
-
+                HookInto::action('wp_ajax_'.$action)
+                    ->orAction('wp_ajax_nopriv_'.$action)
+                    ->run(function () use ($action) {
                         Request::maybeParseInput();
 
                         do_action('genie_received_ajax_request', $action, Request::getData());
 
                         $requestPath = Request::get('request');
 
-                        if (!$requestPath) {
+                        if ( ! $requestPath) {
                             Response::error([
                                 'message' => "No request specified",
                             ]);
                         }
 
-                        if (!static::canHandle($requestPath)) {
+                        if ( ! static::canHandle($requestPath)) {
                             Response::notFound([
                                 'message' => "Request: {$requestPath} not found",
                             ]);
@@ -69,7 +67,7 @@ class AjaxHandler implements GenieComponent
 
                         // The Callback exists
                         $callback = static::$paths[$requestPath];
-                        $params = Tools::getCallableParameters($callback);
+                        $params   = Tools::getCallableParameters($callback);
 
                         if (is_wp_error($params)) {
                             Response::error([
@@ -79,14 +77,14 @@ class AjaxHandler implements GenieComponent
 
                         // So we have a nice list of params
                         // was a nonce sent?
-                        if (!Request::has('nonce')) {
+                        if ( ! Request::has('nonce')) {
                             Response::error([
                                 'message' => 'No nonce specified',
                                 'params'  => $params,
                             ]);
                         }
 
-                        if (!wp_verify_nonce(Request::get('nonce'), $requestPath)) {
+                        if ( ! wp_verify_nonce(Request::get('nonce'), $requestPath)) {
                             Response::error([
                                 'message' => 'invalid nonce',
                             ]);
@@ -102,20 +100,17 @@ class AjaxHandler implements GenieComponent
                         }
 
                         try {
-
                             $callbackParams = [];
 
                             foreach ($params as $param) {
                                 $name = $param->getName();
-                                if (!$param->isOptional() && !Request::has($name)) {
+                                if ( ! $param->isOptional() && ! Request::has($name)) {
                                     Response::failure(['message' => "required parameter {$name} is missing"]);
                                 }
                                 $callbackParams[$name] = Request::get($name);
                             }
                             Response::success(call_user_func_array($callback, $callbackParams));
-
                         } catch (Throwable $error) {
-
                             $response = [
                                 'message' => $error->getMessage(),
                             ];
@@ -139,23 +134,11 @@ class AjaxHandler implements GenieComponent
             ->run(function (Environment $twig) {
                 $function = new TwigFunction('ajax_url', [static::class, 'generateUrl']);
                 $twig->addFunction($function);
+
                 return $twig;
             });
     }
 
-
-    /**
-     * get the name to use for the ajax action
-     *
-     * @return string
-     */
-    protected static function getAction()
-    {
-        if (!static::$action) {
-            static::$action = apply_filters('genie_ajax_action', 'ajax');
-        }
-        return static::$action;
-    }
 
 
     /**
@@ -165,10 +148,11 @@ class AjaxHandler implements GenieComponent
      *
      * @return bool
      */
-    public static function canHandle($requestPath)
+    public static function canHandle($requestPath): bool
     {
         return isset(static::$paths[$requestPath]);
     }
+
 
 
     /**
@@ -178,12 +162,12 @@ class AjaxHandler implements GenieComponent
      *
      * @return string
      */
-    public static function generateUrl($requestPath)
+    public static function generateUrl($requestPath): string
     {
         return add_query_arg(
             [
                 'nonce'   => wp_create_nonce($requestPath),
-                'action'  => static::getAction(),
+                'action'  => static::getActionName(),
                 'request' => $requestPath,
             ],
             admin_url('admin-ajax.php')
@@ -191,15 +175,32 @@ class AjaxHandler implements GenieComponent
     }
 
 
+
     /**
      * Register an ajax callback function
      *
-     * @param string $path
-     * @param callable $callback
+     * @param  string  $path
+     * @param  callable  $callback
      */
     public static function register(string $path, callable $callback)
     {
         static::$paths[$path] = $callback;
+    }
+
+
+
+    /**
+     * get the name to use for the ajax action
+     *
+     * @return string
+     */
+    protected static function getActionName(): string
+    {
+        if ( ! static::$action) {
+            static::$action = apply_filters('genie_ajax_action', Registry::get('genie_ajax_action'));
+        }
+
+        return static::$action;
     }
 
 }

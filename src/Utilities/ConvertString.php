@@ -16,7 +16,6 @@ use Symfony\Component\String\Inflector\EnglishInflector;
 class ConvertString
 {
 
-
     /**
      * An array that hold the words in a string
      *
@@ -25,14 +24,16 @@ class ConvertString
     var $words = [];
 
 
+
     /**
      * ConvertString constructor.
      *
-     * @param $string
+     * @param  string  $string
+     * @param  string|null  $case
      */
-    public function __construct($string, $case = null)
+    public function __construct(string $string, string $case = null)
     {
-        if ($case == 'pascalCase') {
+        if ($case === 'pascalCase') {
             $string = ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $string)), '_');
         }
 
@@ -40,33 +41,20 @@ class ConvertString
     }
 
 
-    /**
-     * Convert a string into an array
-     *
-     * @param $string
-     */
-    private function convertToArray($string)
-    {
-        $string = preg_replace('/[^A-Za-z0-9\-_ ]/', '', $string);
-        $string = preg_replace('/[\-_]/', ' ', $string);
-        $string = preg_replace('!\s+!', ' ', $string);
-
-        $this->words = explode(' ', trim($string));
-    }
-
 
     /**
      * static constructor
      *
-     * @param $string
-     * @param $case
+     * @param  string  $string
+     * @param  string|null  $case
      *
      * @return ConvertString
      */
-    public static function from($string, $case = null): ConvertString
+    public static function from(string $string, string $case = null): ConvertString
     {
         return new static($string, $case);
     }
+
 
 
     /**
@@ -80,41 +68,32 @@ class ConvertString
     }
 
 
+
     /**
-     * @param string $with
+     * @param  string  $with
      *
      * @return string
      */
-    public function return($with = ' '): string
+    public function return(string $with = ' '): string
     {
         return implode($with, $this->words);
     }
 
 
-    /**
-     * Convert to upper case
-     *
-     * @return ConvertString
-     */
-    public function toUpperCase(): ConvertString
-    {
-        array_walk($this->words, function (&$word) {
-            $word = strtoupper($word);
-        });
-
-        return $this;
-    }
-
 
     /**
-     * Turn string into a slug
+     * Turn a string into camelCase
      *
      * @return string
      */
-    public function toSlug(): string
+    public function toCamelCase(): string
     {
-        return $this->toLowerCase()->return('-');
+        $this->toTitleCase();
+        $this->words[0] = strtolower($this->words[0]);
+
+        return $this->return('');
     }
+
 
 
     /**
@@ -132,18 +111,73 @@ class ConvertString
     }
 
 
+
     /**
-     * Turn a string into camelCase
+     * Turn string into a slug
      *
      * @return string
      */
-    public function toCamelCase(): string
+    public function toPascalCase(): string
     {
-        $this->toTitleCase();
-        $this->words[0] = strtolower($this->words[0]);
-
-        return $this->return('');
+        return $this->toTitleCase()->return('');
     }
+
+
+
+    /**
+     * Convert to plural
+     *
+     * @return ConvertString
+     */
+    public function toPlural(): ConvertString
+    {
+        $inflector = new EnglishInflector();
+        $string    = $inflector->pluralize((string) $this);
+        $this->convertToArray($string[0]);
+
+        return $this;
+    }
+
+
+
+    /**
+     * Convert to singular
+     *
+     * @return ConvertString
+     */
+    public function toSingular(): ConvertString
+    {
+        $inflector = new EnglishInflector();
+        $string    = $inflector->singularize((string) $this);
+        $this->convertToArray($string[0]);
+
+        return $this;
+    }
+
+
+
+    /**
+     * Turn string into a slug
+     *
+     * @return string
+     */
+    public function toSlug(): string
+    {
+        return $this->toLowerCase()->return('-');
+    }
+
+
+
+    /**
+     * Turn string into a slug
+     *
+     * @return string
+     */
+    public function toSnakeCase(): string
+    {
+        return $this->toLowerCase()->return('_');
+    }
+
 
 
     /**
@@ -183,7 +217,7 @@ class ConvertString
         ];
         foreach ($this->words as $key => $word) {
             // If this word is the first, or it's not one of our small words, capitalise it with ucwords().
-            if ($key == 0 or !in_array(strtolower($word), $ignoreWords)) {
+            if ($key == 0 or ! in_array(strtolower($word), $ignoreWords)) {
                 $this->words[$key] = ucwords($word);
             }
         }
@@ -192,56 +226,35 @@ class ConvertString
     }
 
 
-    /**
-     * Turn string into a slug
-     *
-     * @return string
-     */
-    public function toSnakeCase(): string
-    {
-        return $this->toLowerCase()->return('_');
-    }
-
 
     /**
-     * Turn string into a slug
-     *
-     * @return string
-     */
-    public function toPascalCase(): string
-    {
-        return $this->toTitleCase()->return('');
-    }
-
-
-    /**
-     * Convert to singular
+     * Convert to upper case
      *
      * @return ConvertString
      */
-    public function toSingular(): ConvertString
+    public function toUpperCase(): ConvertString
     {
-
-        $inflector = new EnglishInflector();
-        $string = $inflector->singularize((string)$this);
-        $this->convertToArray($string[0]);
+        array_walk($this->words, function (&$word) {
+            $word = strtoupper($word);
+        });
 
         return $this;
     }
 
 
-    /**
-     * Convert to plural
-     *
-     * @return ConvertString
-     */
-    public function toPlural(): ConvertString
-    {
-        $inflector = new EnglishInflector();
-        $string = $inflector->pluralize((string)$this);
-        $this->convertToArray($string[0]);
 
-        return $this;
+    /**
+     * Convert a string into an array
+     *
+     * @param $string
+     */
+    private function convertToArray($string)
+    {
+        $string = preg_replace('/[^A-Za-z0-9\-_ ]/', '', $string);
+        $string = preg_replace('/[\-_]/', ' ', $string);
+        $string = preg_replace('!\s+!', ' ', $string);
+
+        $this->words = explode(' ', trim($string));
     }
 
 }

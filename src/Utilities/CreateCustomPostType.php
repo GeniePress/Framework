@@ -11,7 +11,6 @@ namespace GeniePress\Utilities;
 class CreateCustomPostType
 {
 
-
     /**
      * see https://codex.wordpress.org/Function_Reference/register_post_type
      *
@@ -50,7 +49,6 @@ class CreateCustomPostType
 
     ];
 
-
     /**
      * Post Type
      *
@@ -59,25 +57,25 @@ class CreateCustomPostType
     protected $postType;
 
 
+
     /**
      * CreateCustomPostType constructor.
      *
-     * @param string $postType Post Type
-     * @param string $singular
-     * @param string $plural
+     * @param  string  $postType  Post Type
+     * @param  string  $singular
+     * @param  string  $plural
      */
     public function __construct(string $postType, string $singular = '', string $plural = '')
     {
-
         $string = ConvertString::from($postType);
 
         $this->postType = $postType;
 
-        if (!$singular) {
-            $singular = (string)$string->toTitleCase()->toSingular();
+        if ( ! $singular) {
+            $singular = (string) $string->toTitleCase()->toSingular();
         }
-        if (!$plural) {
-            $plural = (string)$string->toPlural();
+        if ( ! $plural) {
+            $plural = (string) $string->toPlural();
         }
 
         $this->setLabels([
@@ -108,48 +106,31 @@ class CreateCustomPostType
     }
 
 
-    function setLabels(array $labels)
-    {
-        foreach ($labels as $label => $value) {
-            $this->setLabel($label, $value);
-        }
-
-        return $this;
-    }
-
-
-    function setLabel($label, $name)
-    {
-        $this->definition['labels'][$label] = $name;
-
-        return $this;
-    }
-
-
-    function set($attribute, $value)
-    {
-        $this->definition[$attribute] = $value;
-
-        return $this;
-    }
-
 
     /**
      * Constructor wrapper
      *
-     * @param string $name
-     * @param string $singular
-     * @param string $plural
+     * @param  string  $name
+     * @param  string  $singular
+     * @param  string  $plural
      *
      * @return CreateCustomPostType
      */
-    public static function called(string $name, string $singular = '', string $plural = '')
+    public static function called(string $name, string $singular = '', string $plural = ''): CreateCustomPostType
     {
         return new static($name, $singular, $plural);
     }
 
 
-    function addSupportFor($for)
+
+    /**
+     * Add support
+     *
+     * @param  string|array  $for
+     *
+     * @return $this
+     */
+    function addSupportFor($for): CreateCustomPostType
     {
         // Turn it into an array if it's not one
         $for = is_array($for) ? $for : [$for];
@@ -161,46 +142,29 @@ class CreateCustomPostType
     }
 
 
-    function addTaxonomy($taxonomy)
+
+    /**
+     * Add a taxonomy
+     *
+     * @param  string  $taxonomy
+     *
+     * @return $this
+     */
+    function addTaxonomy(string $taxonomy): CreateCustomPostType
     {
         $this->definition['taxonomies'][] = $taxonomy;
+
         return $this;
     }
+
 
 
     /**
-     * Set up a custom post type to work only in the backend.
+     * Make sure this post is only accessible for administrators
      *
      * @return $this
      */
-    function backendOnly()
-    {
-        $this->set('rewrite', false);
-        $this->set('query_var', false);
-        $this->set('publicly_queryable', false);
-        $this->set('public', false);
-
-        return $this;
-    }
-
-
-    /**
-     * Set up a custom post type to work in the front-end
-     *
-     * @return $this
-     */
-    function frontend()
-    {
-        $this->set('rewrite', true);
-        $this->set('query_var', true);
-        $this->set('publicly_queryable', true);
-        $this->set('public', true);
-
-        return $this;
-    }
-
-
-    function adminOnly()
+    function adminOnly(): CreateCustomPostType
     {
         $this->set('capabilities', [
             'edit_post'          => 'update_core',
@@ -212,8 +176,44 @@ class CreateCustomPostType
             'publish_posts'      => 'update_core',
             'read_private_posts' => 'update_core',
         ]);
+
         return $this;
     }
+
+
+
+    /**
+     * Set up a custom post type to work only in the backend.
+     *
+     * @return $this
+     */
+    function backendOnly(): CreateCustomPostType
+    {
+        $this->set('rewrite', false);
+        $this->set('query_var', false);
+        $this->set('publicly_queryable', false);
+        $this->set('public', false);
+
+        return $this;
+    }
+
+
+
+    /**
+     * Set up a custom post type to work in the front-end
+     *
+     * @return $this
+     */
+    function frontend(): CreateCustomPostType
+    {
+        $this->set('rewrite', true);
+        $this->set('query_var', true);
+        $this->set('publicly_queryable', true);
+        $this->set('public', true);
+
+        return $this;
+    }
+
 
 
     /**
@@ -221,7 +221,7 @@ class CreateCustomPostType
      *
      * @return $this
      */
-    function hidden()
+    function hidden(): CreateCustomPostType
     {
         $this->set('show_ui', false);
         $this->set('show_in_nav_menus', false);
@@ -230,7 +230,8 @@ class CreateCustomPostType
     }
 
 
-    function icon(string $icon)
+
+    function icon(string $icon): CreateCustomPostType
     {
         $this->set('menu_icon', $icon);
 
@@ -238,12 +239,13 @@ class CreateCustomPostType
     }
 
 
+
     /**
      * Register this custom post type
      *
-     * @param int $sequence
+     * @param  int  $sequence
      */
-    function register($sequence = 20)
+    function register(int $sequence = 20)
     {
         HookInto::action('init', $sequence)
             ->run(function () {
@@ -252,7 +254,15 @@ class CreateCustomPostType
     }
 
 
-    function removeSupportFor($for)
+
+    /**
+     * Remove support for
+     *
+     * @param $for
+     *
+     * @return $this
+     */
+    function removeSupportFor($for): CreateCustomPostType
     {
         // Turn it into an array if it's not one
         $for = is_array($for) ? $for : [$for];
@@ -261,6 +271,58 @@ class CreateCustomPostType
             if (($key = array_search($support, $this->definition['supports'])) !== false) {
                 unset($this->definition['supports'][$key]);
             }
+        }
+
+        return $this;
+    }
+
+
+
+    /**
+     * set any attribute
+     *
+     * @param $attribute
+     * @param $value
+     *
+     * @return $this
+     */
+    function set($attribute, $value): CreateCustomPostType
+    {
+        $this->definition[$attribute] = $value;
+
+        return $this;
+    }
+
+
+
+    /**
+     * set a label
+     *
+     * @param $label
+     * @param $name
+     *
+     * @return $this
+     */
+    function setLabel($label, $name): CreateCustomPostType
+    {
+        $this->definition['labels'][$label] = $name;
+
+        return $this;
+    }
+
+
+
+    /**
+     * set labels
+     *
+     * @param  array  $labels
+     *
+     * @return $this
+     */
+    function setLabels(array $labels): CreateCustomPostType
+    {
+        foreach ($labels as $label => $value) {
+            $this->setLabel($label, $value);
         }
 
         return $this;

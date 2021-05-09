@@ -5,13 +5,9 @@ namespace GeniePress\Fields;
 class RangeField extends NumberField
 {
 
-
-    protected $type = 'range';
-
-
-    protected $metaQuery = 'NUMERIC';
-
-
+    /**
+     * Set defaults
+     */
     protected function setDefaults()
     {
         parent::setDefaults();

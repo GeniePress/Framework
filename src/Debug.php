@@ -10,11 +10,10 @@ namespace GeniePress;
 class Debug
 {
 
-
     /**
      * Dump a variable to the console
      *
-     * @param mixed $var
+     * @param  mixed  $var
      */
     public static function console($var)
     {
@@ -26,17 +25,6 @@ class Debug
         echo "<script>console.log($var)</script>";
     }
 
-
-    /**
-     * Dump and die
-     *
-     * @param $var
-     */
-    public static function dd($var)
-    {
-        self::d($var);
-        exit;
-    }
 
 
     /**
@@ -52,5 +40,17 @@ class Debug
         print "<pre>$var</pre>";
     }
 
+
+
+    /**
+     * Dump and die
+     *
+     * @param $var
+     */
+    public static function dd($var)
+    {
+        self::d($var);
+        exit;
+    }
 
 }

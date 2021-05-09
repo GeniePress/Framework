@@ -34,13 +34,12 @@ use GeniePress\Utilities\HookInto;
 abstract class Field
 {
 
-
     use HasData;
 
     /**
      * Field constructor.
      *
-     * @param string $name
+     * @param  string  $name
      */
     public function __construct(string $name)
     {
@@ -48,284 +47,6 @@ abstract class Field
         $this->setDefaults();
     }
 
-
-    /**
-     * Set defaults for all Fields
-     */
-    protected function setDefaults()
-    {
-        $this->_name = $this->name;
-        $this->_prepare = 0;
-        $this->_valid = 0;
-        $this->hooks = [];
-
-        $this->type('text');
-        $this->key('');
-        $this->label((string)ConvertString::from($this->name)->toTitleCase());
-        $this->metaQuery('CHAR');
-        /* (int) Whether or not the field value is required. Defaults to 0 */
-        $this->required(0);
-
-        /* hack - cant seem to figure out how ACF adds _name to locally imported groups.
-            This is needed by the acf_format_value function */
-        $this->append('');
-        $this->prepend('');
-
-        /* (string) Unique identifier for the field. Must begin with 'field_' */
-        $this->instructions('');
-
-        /* (int) read Only. Defaults to 0 */
-        $this->readOnly(0);
-
-        /* (mixed) Conditionally hide or show this field based on other field's values.
-        Best to use the ACF UI and export to understand the array structure. Defaults to 0 */
-        $this->conditionalLogic(0);
-
-        /* (array) An array of attributes given to the field element */
-        $this->wrapperWidth('');
-        $this->wrapperClass('');
-        $this->id('');
-
-        /* (mixed) A default value used by ACF if no value has yet been saved */
-        $this->default('');
-
-        /* Genie Defaults */
-        $this->hidden(false);
-
-        /* Does this field not have any input?  Tab & Message */
-        $this->displayOnly(false);
-
-        /* WordPress post field to override on save (e.g post_title) */
-        $this->override(false);
-    }
-
-
-    /**
-     * Set the field type
-     *
-     * @param $type
-     *
-     * @return $this
-     */
-    protected function type($type)
-    {
-        return $this->set('type', $type);
-    }
-
-
-    /**
-     * Set a value
-     *
-     * @param $var
-     * @param $value
-     *
-     * @return $this
-     */
-    public function set($var, $value)
-    {
-        $this->$var = $value;
-        return $this;
-    }
-
-
-    /**
-     * Sets the key for this field
-     *
-     * @param $key
-     *
-     * @return $this
-     */
-    public function key($key)
-    {
-        return $this->set('key', $key);
-    }
-
-
-    /**
-     * Sets a label for this field
-     *
-     * @param $label
-     *
-     * @return $this
-     */
-    public function label($label)
-    {
-        return $this->set('label', $label);
-    }
-
-
-    protected function metaQuery($metaQuery)
-    {
-        return $this->set('meta_query', $metaQuery);
-    }
-
-
-    /**
-     * Is this field required ?
-     *
-     * @param bool $value
-     *
-     * @return $this
-     */
-    public function required(bool $value)
-    {
-        return $this->set('required', $value);
-    }
-
-
-    /**
-     * Set the Append
-     *
-     * @param string $string
-     *
-     * @return $this
-     */
-    public function append(string $string)
-    {
-        return $this->set('append', $string);
-    }
-
-
-    /**
-     * Set the Prefix
-     *
-     * @param string $string
-     *
-     * @return $this
-     */
-    public function prepend(string $string)
-    {
-        return $this->set('prepend', $string);
-    }
-
-
-    /**
-     * Field instructions
-     *
-     * @param string $instructions
-     *
-     * @return $this
-     */
-    public function instructions(string $instructions)
-    {
-        return $this->set('instructions', $instructions);
-    }
-
-
-    /**
-     * Sets a label for this field
-     *
-     * @param bool $readOnly
-     *
-     * @return $this
-     */
-    public function readOnly(bool $readOnly)
-    {
-        return $this->set('read_only', $readOnly);
-    }
-
-
-    /**
-     * Field Conditional Logic as an Array
-     *
-     * @param $conditionalLogic
-     *
-     * @return $this
-     */
-    public function conditionalLogic($conditionalLogic)
-    {
-        return $this->set('conditional_logic', $conditionalLogic);
-    }
-
-
-    /**
-     * Sets the wrapper width in %
-     *
-     * @param $width
-     *
-     * @return $this
-     */
-    public function wrapperWidth($width)
-    {
-        $this->data['wrapper']['width'] = $width;
-
-        return $this;
-    }
-
-
-    /**
-     * Set the wrapper Class
-     *
-     * @param $class
-     *
-     * @return $this
-     */
-    public function wrapperClass($class)
-    {
-        $this->data['wrapper']['class'] = $class;
-
-        return $this;
-    }
-
-
-    /**
-     * Sets the HTML id
-     *
-     * @param $id
-     *
-     * @return $this
-     */
-    public function id($id)
-    {
-        $this->data['wrapper']['id'] = $id;
-
-        return $this;
-    }
-
-
-    /**
-     * Set the default value for this field.
-     *
-     * @param $default
-     *
-     * @return $this
-     */
-    public function default($default)
-    {
-        return $this->set('default_value', $default);
-    }
-
-
-    /**
-     * if this field hidden?
-     *
-     * @param bool $value
-     *
-     * @return $this
-     */
-    public function hidden(bool $value)
-    {
-        return $this->set('hidden', $value);
-    }
-
-
-    public function displayOnly($displayOnly)
-    {
-        return $this->set('displayOnly', $displayOnly);
-    }
-
-
-    /**
-     * Allows overriding wordpress fields
-     *
-     * @param $field
-     *
-     * @return $this
-     */
-    public function override($field)
-    {
-        return $this->set('override', $field);
-    }
 
 
     /**
@@ -335,30 +56,33 @@ abstract class Field
      *
      * @return static
      */
-    public static function called($name)
+    public static function called($name): Field
     {
         return new static($name);
     }
 
 
+
     /**
+     * Add a callback
+     *
      * use {$key},{$name},{$type} in the hook name
      *
-     * @param string $action
-     * @param callable $callback
-     * @param int $priority
+     * @param  string  $action
+     * @param  callable  $callback
+     * @param  int  $priority
+     *
+     * @return Field
      */
-    public function addAction(string $action, callable $callback, int $priority = 10)
+    public function addAction(string $action, callable $callback, int $priority = 10): Field
     {
-
         $hooks = $this->hooks;
 
-        $hooks[] = (object)[
+        $hooks[] = (object) [
             'type'     => 'action',
             'hook'     => $action,
             'callback' => $callback,
             'priority' => $priority,
-
         ];
 
         $this->hooks = $hooks;
@@ -367,17 +91,20 @@ abstract class Field
     }
 
 
+
     /**
      * use {$key},{$name},{$type} in the filter name
      *
-     * @param string $filter
-     * @param callable $callback
-     * @param int $priority
+     * @param  string  $filter
+     * @param  callable  $callback
+     * @param  int  $priority
+     *
+     * @return Field
      */
-    public function addFilter(string $filter, callable $callback, int $priority = 10)
+    public function addFilter(string $filter, callable $callback, int $priority = 10): Field
     {
-        $hooks = $this->hooks;
-        $hooks[] = (object)[
+        $hooks       = $this->hooks;
+        $hooks[]     = (object) [
             'type'     => 'filter',
             'hook'     => $filter,
             'callback' => $callback,
@@ -389,10 +116,54 @@ abstract class Field
     }
 
 
-    public function action(callable $function)
+
+    /**
+     * Set the Append
+     *
+     * @param  string  $string
+     *
+     * @return $this
+     */
+    public function append(string $string): Field
     {
-        return $this->set('callback', $function);
+        return $this->set('append', $string);
     }
+
+
+
+    /**
+     * Field Conditional Logic as an Array
+     *
+     * @param $conditionalLogic
+     *
+     * @return $this
+     */
+    public function conditionalLogic($conditionalLogic): Field
+    {
+        return $this->set('conditional_logic', $conditionalLogic);
+    }
+
+
+
+    /**
+     * Set the default value for this field.
+     *
+     * @param $default
+     *
+     * @return $this
+     */
+    public function default($default): Field
+    {
+        return $this->set('default_value', $default);
+    }
+
+
+
+    public function displayOnly($displayOnly): Field
+    {
+        return $this->set('displayOnly', $displayOnly);
+    }
+
 
 
     /**
@@ -402,12 +173,16 @@ abstract class Field
      *
      * @return array
      */
-    public function generate($parent_key)
+    public function generate($parent_key): array
     {
+        // Allow the defaults to be filtered
+        apply_filters('genie_field_generate', $this);
+        apply_filters('genie_field_generate_'.$this->type, $this);
+
         $key = $this->key;
-        if (!$key) {
-            $key = $parent_key . '_' . strtolower($this->name);
-            $this->set('key', 'field_' . $key);
+        if ( ! $key) {
+            $key = $parent_key.'_'.strtolower($this->name);
+            $this->set('key', 'field_'.$key);
         }
 
         if (isset($this->sub_fields)) {
@@ -427,7 +202,7 @@ abstract class Field
             $this->set('layouts', $subFields);
         }
 
-        // hooks
+        // Handle hooks
         foreach ($this->hooks as $hook) {
             if ($hook->type === 'filter') {
                 HookInto::filter($this->parseHookName($hook->hook), $hook->priority)
@@ -442,6 +217,205 @@ abstract class Field
     }
 
 
+
+    /**
+     * if this field hidden?
+     *
+     * @param  bool  $value
+     *
+     * @return $this
+     */
+    public function hidden(bool $value): Field
+    {
+        return $this->set('hidden', $value);
+    }
+
+
+
+    /**
+     * Sets the HTML id
+     *
+     * @param $id
+     *
+     * @return $this
+     */
+    public function id($id): Field
+    {
+        $this->data['wrapper']['id'] = $id;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Field instructions
+     *
+     * @param  string  $instructions
+     *
+     * @return $this
+     */
+    public function instructions(string $instructions): Field
+    {
+        return $this->set('instructions', $instructions);
+    }
+
+
+
+    /**
+     * Sets the key for this field
+     *
+     * @param $key
+     *
+     * @return $this
+     */
+    public function key($key): Field
+    {
+        return $this->set('key', $key);
+    }
+
+
+
+    /**
+     * Sets a label for this field
+     *
+     * @param $label
+     *
+     * @return $this
+     */
+    public function label($label): Field
+    {
+        return $this->set('label', $label);
+    }
+
+
+
+    /**
+     * Allows overriding wordpress fields
+     *
+     * @param $field
+     *
+     * @return $this
+     */
+    public function override($field): Field
+    {
+        return $this->set('override', $field);
+    }
+
+
+
+    /**
+     * Set the Prefix
+     *
+     * @param  string  $string
+     *
+     * @return $this
+     */
+    public function prepend(string $string): Field
+    {
+        return $this->set('prepend', $string);
+    }
+
+
+
+    /**
+     * Sets a label for this field
+     *
+     * @param  bool  $readOnly
+     *
+     * @return $this
+     */
+    public function readOnly(bool $readOnly): Field
+    {
+        return $this->set('read_only', $readOnly);
+    }
+
+
+
+    /**
+     * Is this field required ?
+     *
+     * @param  bool  $value
+     *
+     * @return $this
+     */
+    public function required(bool $value): Field
+    {
+        return $this->set('required', $value);
+    }
+
+
+
+    /**
+     * Set a value
+     *
+     * @param $var
+     * @param $value
+     *
+     * @return $this
+     */
+    public function set($var, $value): Field
+    {
+        $this->$var = $value;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Field condition
+     *
+     * @param  Condition  $condition
+     *
+     * @return $this
+     */
+    public function shown(Condition $condition): Field
+    {
+        return $this->set('conditions', $condition->generate());
+    }
+
+
+
+    /**
+     * Set the wrapper Class
+     *
+     * @param $class
+     *
+     * @return $this
+     */
+    public function wrapperClass($class): Field
+    {
+        $this->data['wrapper']['class'] = $class;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Sets the wrapper width in %
+     *
+     * @param $width
+     *
+     * @return $this
+     */
+    public function wrapperWidth($width): Field
+    {
+        $this->data['wrapper']['width'] = $width;
+
+        return $this;
+    }
+
+
+
+    protected function metaQuery($metaQuery): Field
+    {
+        return $this->set('meta_query', $metaQuery);
+    }
+
+
+
     /**
      * Now that we have generated the key, we can return a property hook
      *
@@ -451,7 +425,7 @@ abstract class Field
      */
     protected function parseHookName($name)
     {
-        $find = [
+        $find    = [
             '{$key}',
             '{$name}',
             '{$type}',
@@ -461,20 +435,79 @@ abstract class Field
             $this->name,
             $this->type,
         ];
+
         return str_replace($find, $replace, $name);
     }
 
 
+
     /**
-     * Field condition
+     * Set defaults for all Fields
+     */
+    protected function setDefaults()
+    {
+        // hack - cant seem to figure out how ACF adds _name to locally imported groups.
+        // This is needed by the acf_format_value function
+        $this->_name    = $this->name;
+        $this->_prepare = 0;
+        $this->_valid   = 0;
+        $this->hooks    = [];
+
+        $this->type('text');
+        $this->key('');
+
+        // The label defaults to the field name
+        $this->label((string) ConvertString::from($this->name)->toTitleCase());
+
+        //  This will be used later when doing smart filtering
+        $this->metaQuery('CHAR');
+
+        // (int) Whether or not the field value is required. Defaults to 0
+        $this->required(0);
+
+        $this->append('');
+        $this->prepend('');
+
+        /* (string) Unique identifier for the field. Must begin with 'field_' */
+        $this->instructions('');
+
+        //(int) read Only. Defaults to 0
+        $this->readOnly(0);
+
+        // (mixed) Conditionally hide or show this field based on other field's values.
+        // Best to use the ACF UI and export to understand the array structure. Defaults to 0
+        $this->conditionalLogic(0);
+
+        // Styling
+        $this->wrapperWidth('');
+        $this->wrapperClass('');
+        $this->id('');
+
+        // default value used by ACF if no value has yet been saved
+        $this->default('');
+
+        // Genie Defaults
+        $this->hidden(false);
+
+        // Does this field not have any input? Used for Tab & Message
+        $this->displayOnly(false);
+
+        // WordPress post field to override on save (e.g post_title)
+        $this->override(false);
+    }
+
+
+
+    /**
+     * Set the field type
      *
-     * @param Condition $condition
+     * @param $type
      *
      * @return $this
      */
-    public function shown(Condition $condition)
+    protected function type($type): Field
     {
-        return $this->set('conditions', $condition->generate());
+        return $this->set('type', $type);
     }
 
 }
