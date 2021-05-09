@@ -5,7 +5,6 @@ namespace GeniePress\Abstracts;
 use GeniePress\Traits\HasData;
 use GeniePress\Utilities\ConvertString;
 use GeniePress\Utilities\HookInto;
-use GeniePress\Utilities\When;
 
 /**
  * Class Field
@@ -177,7 +176,8 @@ abstract class Field
     public function generate($parent_key): array
     {
         // Allow the defaults to be filtered
-        $this->fill(apply_filters('genie_field_'.$this->type, $this->getData()));
+        apply_filters('genie_field_generate', $this);
+        apply_filters('genie_field_generate_'.$this->type, $this);
 
         $key = $this->key;
         if ( ! $key) {
