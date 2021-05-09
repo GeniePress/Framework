@@ -68,7 +68,7 @@ class Deploy implements GenieComponent
      */
     protected static function loadReleases()
     {
-        $releaseFolder = apply_filters('genie_release_folder', Registry::get('genie_release_folder'));
+        $releaseFolder = apply_filters('genie_release_folder', Registry::get('genie_config','release_folder'));
 
         if ( ! $releaseFolder || ! file_exists($releaseFolder)) {
             return;
