@@ -680,6 +680,8 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
             }
         }
 
+        $this->originalData = $this->data;
+
         $this->clearCache();
 
         $this->afterSave();
