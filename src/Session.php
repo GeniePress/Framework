@@ -23,17 +23,19 @@ class Session implements GenieComponent
         // Run once everything has been setup
         HookInto::action('after_setup_theme')
             ->run(function () {
-                $sessionName = apply_filters('genie_session_name', Registry::get('genie_config','session_name'));
+                $sessionName = apply_filters('genie_session_name', Registry::get('genie_config', 'session_name'));
 
                 session_name($sessionName);
 
                 if ( ! session_id()) {
                     session_start();
                 }
-                $maxTime = ini_get("session.gc_maxlifetime");
 
-                // Force our cookie expiry date
-                setcookie(session_name(), session_id(), time() + $maxTime, '/');
+                $maxTime      = apply_filters('genie_session_max_time', ini_get("session.gc_maxlifetime"));
+                $cookieDomain = apply_filters('genie_session_cookie_domain', COOKIE_DOMAIN);
+                $secure       = apply_filters('genie_session_secure', true);
+                $httpOnly     = apply_filters('genie_session_http_only', true);
+                setcookie(session_name(), session_id(), time() + $maxTime, '/', $cookieDomain, $secure, $httpOnly);
 
                 // Last request was more than $maxTime seconds ago?
                 if (isset($_SESSION['sessionLastActivity']) && (time() - $_SESSION['sessionLastActivity'] > $maxTime)) {
@@ -101,59 +103,6 @@ class Session implements GenieComponent
 
 
     /**
-     * Get a value from the session
-     *
-     * @param $var
-     * @param  bool  $default
-     *
-     * @return array|bool|mixed
-     */
-    public static function get($var, $default = false)
-    {
-        return self::find($var, $default);
-    }
-
-
-
-    /**
-     * Get the session ID
-     *
-     * @return string
-     */
-    public static function getSessionID()
-    {
-        return session_id();
-    }
-
-
-
-    /**
-     * Check if the session has a value
-     *
-     * @param $field
-     *
-     * @return bool
-     */
-    public static function has($field)
-    {
-        return self::find($field) ? true : false;
-    }
-
-
-
-    /**
-     * Check if there is an active session
-     *
-     * @return bool
-     */
-    public static function isSessionActive(): bool
-    {
-        return session_status() === PHP_SESSION_ACTIVE;
-    }
-
-
-
-    /**
      * Get the variables that needs to be saved, and then add them to the session.
      */
     public static function processVariables()
@@ -170,18 +119,6 @@ class Session implements GenieComponent
                 $_SESSION[$field] = stripslashes($val);
             }
         }
-    }
-
-
-
-    /**
-     * Remove a value for the session
-     *
-     * @param $var
-     */
-    public static function remove($var)
-    {
-        unset($_SESSION[$var]);
     }
 
 
@@ -230,6 +167,71 @@ class Session implements GenieComponent
         }
 
         return $lookAt;
+    }
+
+
+
+    /**
+     * Check if there is an active session
+     *
+     * @return bool
+     */
+    public static function isSessionActive(): bool
+    {
+        return session_status() === PHP_SESSION_ACTIVE;
+    }
+
+
+
+    /**
+     * Get a value from the session
+     *
+     * @param $var
+     * @param  bool  $default
+     *
+     * @return array|bool|mixed
+     */
+    public static function get($var, $default = false)
+    {
+        return self::find($var, $default);
+    }
+
+
+
+    /**
+     * Get the session ID
+     *
+     * @return string
+     */
+    public static function getSessionID()
+    {
+        return session_id();
+    }
+
+
+
+    /**
+     * Check if the session has a value
+     *
+     * @param $field
+     *
+     * @return bool
+     */
+    public static function has($field)
+    {
+        return self::find($field) ? true : false;
+    }
+
+
+
+    /**
+     * Remove a value for the session
+     *
+     * @param $var
+     */
+    public static function remove($var)
+    {
+        unset($_SESSION[$var]);
     }
 
 }
