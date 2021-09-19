@@ -2,7 +2,9 @@
 
 namespace GeniePress\Utilities;
 
-use Symfony\Component\String\Inflector\EnglishInflector;
+
+
+use GeniePress\Library\EnglishInflector;
 
 /**
  * Class ConvertString
@@ -131,8 +133,7 @@ class ConvertString
      */
     public function toPlural(): ConvertString
     {
-        $inflector = new EnglishInflector();
-        $string    = $inflector->pluralize((string) $this);
+        $string    = EnglishInflector::pluralize((string) $this);
         $this->convertToArray($string[0]);
 
         return $this;
@@ -147,8 +148,7 @@ class ConvertString
      */
     public function toSingular(): ConvertString
     {
-        $inflector = new EnglishInflector();
-        $string    = $inflector->singularize((string) $this);
+        $string    = EnglishInflector::singularize((string) $this);
         $this->convertToArray($string[0]);
 
         return $this;

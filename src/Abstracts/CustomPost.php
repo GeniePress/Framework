@@ -9,7 +9,7 @@ use GeniePress\Traits\HasData;
 use GeniePress\Utilities\ConvertString;
 use GeniePress\Utilities\HookInto;
 use GeniePress\WordPress;
-use Illuminate\Support\Collection;
+use GeniePress\Library\Collection;
 use JsonSerializable;
 use WP_Error;
 

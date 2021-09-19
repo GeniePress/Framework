@@ -1,23 +1,24 @@
 {
-  "name": "geniepress/framework",
-  "description": "The GeniePress framework",
-  "keywords": ["framework", "wordpress"],
-  "type": "library",
-  "license": "MIT",
-  "require": {
-    "php": "^7.3.0|^8.0",
-    "ext-curl": "*",
-    "ext-json": "*",
-    "twig/twig": "^2.1",
-    "inlinestyle/inlinestyle": "^1.2.7",
-    "illuminate/support": "^7.27",
-    "symfony/inflector": "^5.1"
-  },
-  "autoload": {
-    "psr-4": {
-      "GeniePress\\": "src"
-    }
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+    "name": "geniepress/framework",
+    "description": "The GeniePress framework",
+    "keywords": [
+        "framework",
+        "wordpress"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^7.3.0|^8.0",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "twig/twig": "^2.1",
+        "inlinestyle/inlinestyle": "^1.2.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "GeniePress\\": "src"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
