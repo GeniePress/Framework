@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace GeniePress\Library;
+namespace GeniePress\Utilities;
+
+use function GeniePress\Library\ctype_upper;
 
 final class EnglishInflector
 {

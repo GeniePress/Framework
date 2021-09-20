@@ -4,8 +4,6 @@ namespace GeniePress\Utilities;
 
 
 
-use GeniePress\Library\EnglishInflector;
-
 /**
  * Class ConvertString
  * (string) ConvertString::From('Monkey Bar)->toPlural()->toTitleCase()
