@@ -134,7 +134,6 @@ class AjaxHandler implements GenieComponent
             ->run(function (Environment $twig) {
                 $function = new TwigFunction('ajax_url', [static::class, 'generateUrl']);
                 $twig->addFunction($function);
-
                 return $twig;
             });
     }
@@ -185,22 +184,6 @@ class AjaxHandler implements GenieComponent
     public static function register(string $path, callable $callback)
     {
         static::$paths[$path] = $callback;
-    }
-
-
-
-    /**
-     * get the name to use for the ajax action
-     *
-     * @return string
-     */
-    protected static function getActionName(): string
-    {
-        if ( ! static::$action) {
-            static::$action = apply_filters('genie_ajax_action', Registry::get('genie_config', 'ajax_action'));
-        }
-
-        return static::$action;
     }
 
 }

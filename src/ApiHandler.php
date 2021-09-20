@@ -121,8 +121,8 @@ class ApiHandler implements GenieComponent
          */
         HookInto::filter('genie_view_twig')
             ->run(function (Environment $twig) {
-                $function = new TwigFunction('api_url', [static::class, 'generateUrl']);
-                $twig->addFunction($function);
+                    $function = new TwigFunction('api_url', [static::class, 'generateUrl']);
+                    $twig->addFunction($function);
 
                 return $twig;
             });
