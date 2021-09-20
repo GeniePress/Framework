@@ -1,20 +1,10 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace GeniePress\Utilities;
-
-use function GeniePress\Library\ctype_upper;
 
 final class EnglishInflector
 {
+
     /**
      * Map English plural to singular suffixes.
      *
@@ -349,14 +339,16 @@ final class EnglishInflector
         'seiceps',
     ];
 
+
+
     /**
      * {@inheritdoc}
      */
     public static function singularize(string $plural): array
     {
-        $pluralRev = strrev($plural);
+        $pluralRev      = strrev($plural);
         $lowerPluralRev = strtolower($pluralRev);
-        $pluralLength = \strlen($lowerPluralRev);
+        $pluralLength   = \strlen($lowerPluralRev);
 
         // Check if the word is one which is not inflected, return early if so
         if (\in_array($lowerPluralRev, self::UNINFLECTED, true)) {
@@ -368,9 +360,9 @@ final class EnglishInflector
         // in the plural table to compare them with the characters of the actual
         // given plural suffix
         foreach (self::PLURAL_MAP as $map) {
-            $suffix = $map[0];
+            $suffix       = $map[0];
             $suffixLength = $map[1];
-            $j = 0;
+            $j            = 0;
 
             // Compare characters in the plural table and of the suffix of the
             // given plural one by one
@@ -385,18 +377,18 @@ final class EnglishInflector
                     if ($j < $pluralLength) {
                         $nextIsVocal = false !== strpos('aeiou', $lowerPluralRev[$j]);
 
-                        if (!$map[2] && $nextIsVocal) {
+                        if ( ! $map[2] && $nextIsVocal) {
                             // suffix may not succeed a vocal but next char is one
                             break;
                         }
 
-                        if (!$map[3] && !$nextIsVocal) {
+                        if ( ! $map[3] && ! $nextIsVocal) {
                             // suffix may not succeed a consonant but next char is one
                             break;
                         }
                     }
 
-                    $newBase = substr($plural, 0, $pluralLength - $suffixLength);
+                    $newBase   = substr($plural, 0, $pluralLength - $suffixLength);
                     $newSuffix = $map[4];
 
                     // Check whether the first character in the plural suffix
@@ -428,14 +420,16 @@ final class EnglishInflector
         return [$plural];
     }
 
+
+
     /**
      * {@inheritdoc}
      */
     public static function pluralize(string $singular): array
     {
-        $singularRev = strrev($singular);
+        $singularRev      = strrev($singular);
         $lowerSingularRev = strtolower($singularRev);
-        $singularLength = \strlen($lowerSingularRev);
+        $singularLength   = \strlen($lowerSingularRev);
 
         // Check if the word is one which is not inflected, return early if so
         if (\in_array($lowerSingularRev, self::UNINFLECTED, true)) {
@@ -447,9 +441,9 @@ final class EnglishInflector
         // in the singular table to compare them with the characters of the actual
         // given singular suffix
         foreach (self::SINGULAR_MAP as $map) {
-            $suffix = $map[0];
+            $suffix       = $map[0];
             $suffixLength = $map[1];
-            $j = 0;
+            $j            = 0;
 
             // Compare characters in the singular table and of the suffix of the
             // given plural one by one
@@ -465,18 +459,18 @@ final class EnglishInflector
                     if ($j < $singularLength) {
                         $nextIsVocal = false !== strpos('aeiou', $lowerSingularRev[$j]);
 
-                        if (!$map[2] && $nextIsVocal) {
+                        if ( ! $map[2] && $nextIsVocal) {
                             // suffix may not succeed a vocal but next char is one
                             break;
                         }
 
-                        if (!$map[3] && !$nextIsVocal) {
+                        if ( ! $map[3] && ! $nextIsVocal) {
                             // suffix may not succeed a consonant but next char is one
                             break;
                         }
                     }
 
-                    $newBase = substr($singular, 0, $singularLength - $suffixLength);
+                    $newBase   = substr($singular, 0, $singularLength - $suffixLength);
                     $newSuffix = $map[4];
 
                     // Check whether the first character in the singular suffix
