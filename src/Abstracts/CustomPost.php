@@ -6,10 +6,10 @@ use GeniePress\Cache;
 use GeniePress\Interfaces\GenieComponent;
 use GeniePress\Registry;
 use GeniePress\Traits\HasData;
+use GeniePress\Utilities\Collection;
 use GeniePress\Utilities\ConvertString;
 use GeniePress\Utilities\HookInto;
 use GeniePress\WordPress;
-use GeniePress\Library\Collection;
 use JsonSerializable;
 use WP_Error;
 
@@ -47,7 +47,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     use HasData;
 
     /**
-     * Wordpress Post Type
+     * WordPress Post Type
      *
      * @var string
      */
@@ -270,7 +270,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
      *
      * @param  array  $params
      *
-     * @return Collection
+     * @return Collection|static[]
      */
     public static function get(array $params = []): Collection
     {
@@ -287,7 +287,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
         $posts       = get_posts(array_merge($defaultArgs, $params));
         $collection  = new Collection();
         foreach ($posts as $id) {
-            $collection->add(new static($id));
+            $collection->append(new static($id));
         }
 
         return $collection;
@@ -339,7 +339,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
      * @param $name
      * @param $taxonomy
      *
-     * @return Collection
+     * @return Collection|static[]
      */
     public static function getByTaxonomyName($name, $taxonomy): Collection
     {
