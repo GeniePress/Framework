@@ -1,7 +1,6 @@
 ## About GeniePress
 
-GeniePress is a WordPress plugin and theme framework with expressive, elegant
-syntax.
+GeniePress is a WordPress plugin and theme framework with expressive, elegant syntax.
 
 ## Learning GeniePress
 
@@ -9,14 +8,26 @@ Have a look at the [GeniePress documentation](https://geneipress.org)
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within GeniePress, please send an
-e-mail to Sunil Jaiswal via [sunil@lnk7.com](mailto:sunil@lnk7.com).
+If you discover a security vulnerability within GeniePress, please send an e-mail to Sunil Jaiswal via [sunil@lnk7.com](mailto:sunil@lnk7.com).
 
 All security vulnerabilities will be promptly addressed.
 
 ## License
 
-The GeniePress framework is open-sourced software licensed under the [MIT
-license](https://opensource.org/licenses/MIT).
+The GeniePress framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 Version 1.1.1
+
+## Change Log
+
+### 2.0.0
+
+- `CustomPost` methods `beforeSave`, `afterSave`, `checkValidity`, `beforeCache`, `afterRead` and `override`  changed to protected.
+- `CustomPost` method `preDelete` renamed to `beforeDelete` and made protected
+- `CustomPost` method `save` return `$this` rather than the ID
+- Attaching schema to a `CustomPost` is now handled in `CreateSchema`
+- Missing `getActionName` added to `AjaxHandler`
+-
+
+### 1.1.1
+- Removed dependencies for Laravel Collection and Symphony EnglishInflector

@@ -176,8 +176,11 @@ class SendEmail
             return $this->body;
         }
 
-        $htmlDoc = new InlineStyle($this->body);
-        $htmlDoc->applyStylesheet($htmlDoc->extractStylesheets());
+        $htmlDoc     = new InlineStyle($this->body);
+        $styleSheets = $htmlDoc->extractStylesheets();
+        foreach ($styleSheets as $styleSheet) {
+            $htmlDoc->applyStylesheet($styleSheet);
+        }
 
         return $htmlDoc->getHTML();
     }

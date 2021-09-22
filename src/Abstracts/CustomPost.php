@@ -11,6 +11,7 @@ use GeniePress\Utilities\ConvertString;
 use GeniePress\Utilities\HookInto;
 use GeniePress\WordPress;
 use JsonSerializable;
+use mysql_xdevapi\Exception;
 use WP_Error;
 
 /**
@@ -82,6 +83,12 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     protected static $useGutenberg = false;
 
     /**
+     * Do we want to autoTrigger a save after the post has been saved in the WordPress admin?
+     * @var bool
+     */
+    protected static $triggerSave = true;
+
+    /**
      * used as a store of loaded data
      *
      * @var array
@@ -91,22 +98,25 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
 
     /**
-     * Setup Wordpress Hooks, filters and register necessary method calls.
+     * Setup WordPress Hooks, filters and register necessary method calls.
      */
     public static function setup()
     {
-        //Clear out cache on save
         HookInto::action('acf/save_post', 20)
             ->run(function ($post_id) {
                 global $post;
 
-                if ( ! $post or $post->post_type != static::$postType) {
+                if ( ! $post or $post->post_type !== static::$postType) {
                     return;
                 }
 
-                // Clear Cache so it's generated next time
-                if (static::$cache) {
-                    Cache::clearPostCache($post_id);
+                // Trigger a save
+                if (static::$triggerSave) {
+                    static::getById($post_id)->save();
+                } else {
+                    if (static::$cache) {
+                        Cache::clearPostCache($post_id);
+                    }
                 }
             });
 
@@ -211,42 +221,6 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
 
     /**
-     * Parse the schema and build a map of the field name / keys
-     * We will use this later when saving data.
-     * Problem with setting static::$schema here so we use the registry instead.
-     * https://stackoverflow.com/questions/4577187/php-5-3-late-static-binding-doesnt-work-for-properties-when-defined-in-parent
-     * This is called from CreateSchema
-     *
-     * @param $schema
-     */
-    public static function attachSchema($schema)
-    {
-        $fields  = Registry::get('fields');
-        $schemas = Registry::get('schemas');
-
-        if ( ! $fields) {
-            $fields = [];
-        }
-        if ( ! $schemas) {
-            $schemas = [];
-        }
-
-        // modify the schema so we get index arrays
-        $level1Fields = [];
-        foreach ($schema['fields'] as $field) {
-            $level1Fields[$field['name']] = $field;
-        }
-
-        $fields[static::class]  = $level1Fields;
-        $schemas[static::class] = $schema;
-
-        Registry::set('fields', $fields);
-        Registry::set('schemas', $schemas);
-    }
-
-
-
-    /**
      * Create an Object from an array of key value pairs.
      *
      * @param  array  $array
@@ -300,9 +274,9 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
      *
      * @param $id
      *
-     * @return static
+     * @return mixed
      */
-    public static function getById($id): CustomPost
+    public static function getById($id)
     {
         return new static($id);
     }
@@ -459,73 +433,11 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
 
     /**
-     * Capture and use ACF before the post is saved.
-     * We can override some of the wordpress fields here.
-     *
-     * @param  array  $data
-     * @param  array  $postArray
-     *
-     * @return array
-     */
-    public static function override(array $data, array $postArray): array
-    {
-        return $data;
-    }
-
-
-
-    /**
-     * After the post has been loaded from the database
-     */
-    public function afterRead()
-    {
-    }
-
-
-
-    /**
-     * After save - Do something!
-     */
-    public function afterSave()
-    {
-    }
-
-
-
-    /**
-     *  Update properties on this object
-     */
-    public function beforeCache()
-    {
-    }
-
-
-
-    /**
-     * Before save - Set defaults / fill values
-     */
-    public function beforeSave()
-    {
-    }
-
-
-
-    /**
-     * Check the validity of this object
-     * Throw errors from here and catch from save
-     */
-    public function checkValidity()
-    {
-    }
-
-
-
-    /**
      * clear the cache for this post
      */
     public function clearCache()
     {
-        if ($this->ID) {
+        if ($this->ID && static::$cache) {
             Cache::clearPostCache($this->ID);
         }
     }
@@ -542,7 +454,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     public function delete(bool $force = true): bool
     {
         if ($this->ID) {
-            $this->preDelete();
+            $this->beforeDelete();
 
             return wp_delete_post($this->ID, $force);
         }
@@ -625,28 +537,18 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
 
     /**
-     * Things to do before delete!
-     * Delete other objects / images etc.
-     */
-    public function preDelete()
-    {
-    }
-
-
-
-    /**
      * Save the custom post type
      *
-     * @return int
+     * @return $this
      */
-    public function save(): int
+    public function save()
     {
         $this->beforeSave();
 
         $this->checkValidity();
 
         if ( ! $this->isDirty()) {
-            return $this->ID;
+            return $this;
         }
 
         $postFields = [];
@@ -686,7 +588,63 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
         $this->afterSave();
 
-        return $this->ID;
+        return $this;
+    }
+
+
+
+    /**
+     * After the post has been loaded from the database
+     */
+    protected function afterRead()
+    {
+    }
+
+
+
+    /**
+     * After save - Do something!
+     */
+    protected function afterSave()
+    {
+    }
+
+
+
+    /**
+     *  Update properties on this object
+     */
+    protected function beforeCache()
+    {
+    }
+
+
+
+    /**
+     * Things to do before delete!
+     * Delete other objects / images etc.
+     */
+    protected function beforeDelete()
+    {
+    }
+
+
+
+    /**
+     * Before save - Set defaults / fill values
+     */
+    protected function beforeSave()
+    {
+    }
+
+
+
+    /**
+     * Check the validity of this object
+     * Throw errors from here and catch from save
+     */
+    protected function checkValidity()
+    {
     }
 
 
@@ -694,7 +652,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     /**
      * Set defaults for this object
      */
-    public function setDefaults()
+    protected function setDefaults()
     {
         $this->post_status = 'publish';
         $this->post_type   = static::$postType;
@@ -737,6 +695,22 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     protected static function getCacheKey(): string
     {
         return Cache::getCachePrefix().'_object';
+    }
+
+
+
+    /**
+     * Capture and use ACF before the post is saved.
+     * We can override some of the wordpress fields here.
+     *
+     * @param  array  $data
+     * @param  array  $postArray
+     *
+     * @return array
+     */
+    protected static function override(array $data, array $postArray): array
+    {
+        return $data;
     }
 
 }

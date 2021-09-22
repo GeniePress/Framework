@@ -35,6 +35,7 @@ class ApiHandler implements GenieComponent
          */
         HookInto::action('init')
             ->run(function () {
+
                 $path   = apply_filters('genie_api_path', Registry::get('genie_config', 'api_path'));
                 $action = apply_filters('genie_api_action', Registry::get('genie_config', 'api_action'));
 
@@ -174,5 +175,8 @@ class ApiHandler implements GenieComponent
             'callback' => $callback,
         ];
     }
+
+
+
 
 }

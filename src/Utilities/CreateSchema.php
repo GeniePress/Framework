@@ -5,6 +5,7 @@ namespace GeniePress\Utilities;
 use GeniePress\Abstracts\Condition;
 use GeniePress\Abstracts\Field;
 use GeniePress\Debug;
+use GeniePress\Registry;
 
 /**
  * Class CreateSchema
@@ -25,13 +26,13 @@ class CreateSchema
 
     private $location;
 
-    private $position = 'normal';  //acf_after_title|normal|side
+    private $position = 'normal';
 
-    private $style = 'default';   //default|seamless
+    private $style = 'default';
 
-    private $label_placement = 'top'; // top|left
+    private $label_placement = 'top';
 
-    private $instruction_placement = 'label'; // label|field
+    private $instruction_placement = 'label';
 
     private $hide_on_screen = [];
 
@@ -128,7 +129,7 @@ class CreateSchema
     /**
      * Instruction Placement
      *
-     * @param  string  $instruction_placement
+     * @param  string  $instruction_placement label|field
      *
      * @return $this
      */
@@ -144,7 +145,7 @@ class CreateSchema
     /**
      * label placement
      *
-     * @param  string  $label_placement
+     * @param  string  $label_placement  top|left
      *
      * @return $this
      */
@@ -174,9 +175,9 @@ class CreateSchema
 
 
     /**
-     * position
+     * Position
      *
-     * @param  string  $position
+     * @param  string  $position acf_after_title|normal|side
      *
      * @return $this
      */
@@ -236,7 +237,7 @@ class CreateSchema
     /**
      * Sets the field styles
      *
-     * @param  string  $style
+     * @param  string  $style  default|seamless
      *
      * @return $this
      */
@@ -375,7 +376,39 @@ class CreateSchema
         ];
 
         if ($this->attachTo) {
-            call_user_func($this->attachTo.'::attachSchema', $schema);
+
+            /**
+             * Parse the schema and build a map of the field name / keys
+             * We will use this later when saving data.
+             * Problem with setting static::$schema here so we use the registry instead.
+             * https://stackoverflow.com/questions/4577187/php-5-3-late-static-binding-doesnt-work-for-properties-when-defined-in-parent
+             * This is called from CreateSchema
+             *
+             * @param $schema
+             */
+
+            $registryFields  = Registry::get('fields');
+            $registrySchemas = Registry::get('schemas');
+
+            if ( ! $registryFields) {
+                $registryFields = [];
+            }
+            if ( ! $registrySchemas) {
+                $registrySchemas = [];
+            }
+
+            // modify the schema so we get index arrays
+            $level1Fields = [];
+            foreach ($schema['fields'] as $level1Field) {
+                $level1Fields[$level1Field['name']] = $level1Field;
+            }
+
+            $registryFields[$this->attachTo]  = $level1Fields;
+            $registrySchemas[$this->attachTo] = $schema;
+
+            Registry::set('fields', $registryFields);
+            Registry::set('schemas', $registrySchemas);
+
         }
 
         return $schema;

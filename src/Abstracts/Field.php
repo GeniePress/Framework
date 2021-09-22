@@ -23,7 +23,7 @@ use GeniePress\Utilities\HookInto;
  * @property bool|mixed|string $append
  * @property bool|mixed|string $prepend
  * @property bool|mixed|string $instructions
- * @property bool|int|mixed $read_only
+ * @property bool|int|mixed $readonly
  * @property bool|int|mixed $conditional_logic
  * @property bool|mixed|string[] $wrapper
  * @property bool|mixed|string $default_value
@@ -167,6 +167,20 @@ abstract class Field
 
 
     /**
+     * Handy shortcut to ACF
+     *
+     * @param  callable  $callable
+     *
+     * @return $this
+     */
+    public function formatValue(callable $callable): Field
+    {
+        return $this->addFilter('acf/format_value/key={$key}', $callable);
+    }
+
+
+
+    /**
      * generate the ACF definition for this field
      *
      * @param $parent_key
@@ -291,6 +305,34 @@ abstract class Field
 
 
     /**
+     * Handy shortcut to ACF
+     *
+     * @param  callable  $callable
+     *
+     * @return $this
+     */
+    public function loadField(callable $callable): Field
+    {
+        return $this->addFilter('acf/load_field/key={$key}', $callable);
+    }
+
+
+
+    /**
+     * Handy shortcut to ACF
+     *
+     * @param  callable  $callable
+     *
+     * @return $this
+     */
+    public function loadValue(callable $callable): Field
+    {
+        return $this->addFilter('acf/load_value/key={$key}', $callable);
+    }
+
+
+
+    /**
      * Allows overriding wordpress fields
      *
      * @param $field
@@ -300,6 +342,20 @@ abstract class Field
     public function override($field): Field
     {
         return $this->set('override', $field);
+    }
+
+
+
+    /**
+     * Handy shortcut to ACF
+     *
+     * @param  callable  $callable
+     *
+     * @return $this
+     */
+    public function prepareField(callable $callable): Field
+    {
+        return $this->addFilter('acf/prepare_field/key={$key}', $callable);
     }
 
 
@@ -327,7 +383,21 @@ abstract class Field
      */
     public function readOnly(bool $readOnly): Field
     {
-        return $this->set('read_only', $readOnly);
+        return $this->set('readonly', $readOnly);
+    }
+
+
+
+    /**
+     * Handy shortcut to ACF
+     *
+     * @param  callable  $callable
+     *
+     * @return $this
+     */
+    public function renderField(callable $callable): Field
+    {
+        return $this->addAction('acf/render_field/key={$key}', $callable);
     }
 
 
@@ -373,6 +443,62 @@ abstract class Field
     public function shown(Condition $condition): Field
     {
         return $this->set('conditions', $condition->generate());
+    }
+
+
+
+    /**
+     * Handy shortcut to ACF
+     *
+     * @param  callable  $callable
+     *
+     * @return $this
+     */
+    public function updateField(callable $callable): Field
+    {
+        return $this->addFilter('acf/update_field/key={$key}', $callable);
+    }
+
+
+
+    /**
+     * Handy shortcut to ACF
+     *
+     * @param  callable  $callable
+     *
+     * @return $this
+     */
+    public function updateValue(callable $callable): Field
+    {
+        return $this->addFilter('acf/update_value/key={$key}', $callable);
+    }
+
+
+
+    /**
+     * Handy shortcut to ACF
+     *
+     * @param  callable  $callable
+     *
+     * @return $this
+     */
+    public function validateAttachment(callable $callable): Field
+    {
+        return $this->addFilter('acf/validate_attachment/key={$key}', $callable);
+    }
+
+
+
+    /**
+     * Handy shortcut to ACF
+     *
+     * @param  callable  $callable
+     *
+     * @return $this
+     */
+    public function validateValue(callable $callable): Field
+    {
+        return $this->addFilter('acf/validate_value/key={$key}', $callable);
     }
 
 
@@ -446,7 +572,7 @@ abstract class Field
      */
     protected function setDefaults()
     {
-        // hack - cant seem to figure out how ACF adds _name to locally imported groups.
+        // hack - can't seem to figure out how ACF adds _name to locally imported groups.
         // This is needed by the acf_format_value function
         $this->_name    = $this->name;
         $this->_prepare = 0;
@@ -462,16 +588,11 @@ abstract class Field
         //  This will be used later when doing smart filtering
         $this->metaQuery('CHAR');
 
-        // (int) Whether or not the field value is required. Defaults to 0
+        // (int) Whether the field value is required. Defaults to 0
         $this->required(0);
-
         $this->append('');
         $this->prepend('');
-
-        /* (string) Unique identifier for the field. Must begin with 'field_' */
         $this->instructions('');
-
-        //(int) read Only. Defaults to 0
         $this->readOnly(0);
 
         // (mixed) Conditionally hide or show this field based on other field's values.
@@ -482,9 +603,8 @@ abstract class Field
         $this->wrapperWidth('');
         $this->wrapperClass('');
         $this->id('');
-
-        // default value used by ACF if no value has yet been saved
         $this->default('');
+        $this->readOnly(false);
 
         // Genie Defaults
         $this->hidden(false);
