@@ -5,6 +5,7 @@ namespace GeniePress\Utilities;
 use GeniePress\Abstracts\Condition;
 use GeniePress\Abstracts\Field;
 use GeniePress\Debug;
+use GeniePress\Genie;
 use GeniePress\Registry;
 
 /**
@@ -129,7 +130,7 @@ class CreateSchema
     /**
      * Instruction Placement
      *
-     * @param  string  $instruction_placement label|field
+     * @param  string  $instruction_placement  label|field
      *
      * @return $this
      */
@@ -177,7 +178,7 @@ class CreateSchema
     /**
      * Position
      *
-     * @param  string  $position acf_after_title|normal|side
+     * @param  string  $position  acf_after_title|normal|side
      *
      * @return $this
      */
@@ -193,15 +194,21 @@ class CreateSchema
     /**
      * Generate and register the schema with ACF
      *
-     * @param  int  $sequence
+     * @param  int  $sequence  The activation hook priority
+     * @param  bool  $onActivation  Should this be registered on activation as well? defaults to true
      */
-    function register(int $sequence = 20)
+    function register(int $sequence = 20, bool $onActivation = true)
     {
-        HookInto::action('init', $sequence)
-            ->run(function () {
-                $schema = $this->return();
+        $hook = HookInto::action('init', $sequence);
+        if ($onActivation) {
+            $hook->orAction(Genie::hookName('activation'), 1);
+        }
+        $hook->run(function () {
+            $schema = $this->return();
+            if (function_exists('acf_add_local_field_group')) {
                 acf_add_local_field_group($schema);
-            });
+            }
+        });
     }
 
 
@@ -376,7 +383,6 @@ class CreateSchema
         ];
 
         if ($this->attachTo) {
-
             /**
              * Parse the schema and build a map of the field name / keys
              * We will use this later when saving data.
@@ -408,7 +414,6 @@ class CreateSchema
 
             Registry::set('fields', $registryFields);
             Registry::set('schemas', $registrySchemas);
-
         }
 
         return $schema;
