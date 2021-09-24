@@ -2,6 +2,8 @@
 
 namespace GeniePress\Utilities;
 
+use GeniePress\Genie;
+
 /**
  * Class CreateTaxonomy
  * Wrapper around the register_taxonomy function
@@ -77,10 +79,12 @@ class CreateTaxonomy
      *
      * @param  string  $name  Name
      */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         $string = ConvertString::from($name);
 
+        // default to the snaked case of teh singular
+        // $name = 'Product Categories' turns into 'product_category'
         $this->taxonomy = $string->toSingular()->toSnakeCase();
 
         $singular = (string) $string->toTitleCase()->toSingular();
@@ -145,6 +149,29 @@ class CreateTaxonomy
 
 
     /**
+     * get the taxonomy definition;
+     * @return array
+     */
+    public function getDefinition(): array
+    {
+        return $this->definition;
+    }
+
+
+
+    /**
+     * Get the taxonomy name
+     *
+     * @return string
+     */
+    public function getTaxonomy(): string
+    {
+        return $this->taxonomy;
+    }
+
+
+
+    /**
      * Sets this taxonomy as being hidden
      *
      * @return $this
@@ -162,16 +189,20 @@ class CreateTaxonomy
     /**
      * Register the Taxonomy
      *
-     * @param  int  $sequence
+     * @param  int  $sequence  The priority
+     * @param  bool  $onActivation  Should this be registered on activation as well? defaults to true
      */
-    function register($sequence = 20)
+    function register(int $sequence = 20, bool $onActivation = true)
     {
-        HookInto::action('init', $sequence)
-            ->run(function () {
-                $attachTo = empty($this->attachTo) ? null : $this->attachTo;
+        $hook = HookInto::action('init', $sequence);
+        if ($onActivation) {
+            $hook->orAction(Genie::hookName('activation'), 1);
+        }
+        $hook->run(function () {
+            $attachTo = empty($this->attachTo) ? null : $this->attachTo;
 
-                register_taxonomy($this->taxonomy, $attachTo, $this->definition);
-            });
+            register_taxonomy($this->taxonomy, $attachTo, $this->definition);
+        });
     }
 
 
@@ -222,6 +253,22 @@ class CreateTaxonomy
         foreach ($labels as $label => $value) {
             $this->setLabel($label, $value);
         }
+
+        return $this;
+    }
+
+
+
+    /**
+     * Set the taxonomy name
+     *
+     * @param  string  $taxonomy
+     *
+     * @return $this
+     */
+    public function setTaxonomy(string $taxonomy): CreateTaxonomy
+    {
+        $this->taxonomy = $taxonomy;
 
         return $this;
     }
