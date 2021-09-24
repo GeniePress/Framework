@@ -3,6 +3,7 @@
 namespace GeniePress\Abstracts;
 
 use GeniePress\Cache;
+use GeniePress\Genie;
 use GeniePress\Interfaces\GenieComponent;
 use GeniePress\Registry;
 use GeniePress\Traits\HasData;
@@ -257,7 +258,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
             'fields'      => 'ids',
         ];
 
-        $defaultArgs = apply_filters('genie_'.static::$postType.'_get_args', $defaultArgs);
+        $defaultArgs = apply_filters(Genie::hookName(static::$postType.'_get_args'), $defaultArgs);
         $posts       = get_posts(array_merge($defaultArgs, $params));
         $collection  = new Collection();
         foreach ($posts as $id) {

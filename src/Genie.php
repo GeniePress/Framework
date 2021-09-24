@@ -3,7 +3,6 @@
 namespace GeniePress;
 
 use GeniePress\Plugins\ACF;
-use GeniePress\Traits\HasData;
 use GeniePress\Utilities\AddAdminNotice;
 use GeniePress\Utilities\HookInto;
 
@@ -11,20 +10,14 @@ use GeniePress\Utilities\HookInto;
  * Class Genie
  *
  * @package GeniePress
- * @property array $components
- * @property string $filename
- * @property string $folder
- * @property string $type
  */
 class Genie
 {
 
-    use HasData;
-
     /**
      * Genie constructor.
      *
-     * @param  string  $type
+     * @param  string  $type plugin|theme
      */
     function __construct(string $type = 'theme')
     {
@@ -49,26 +42,23 @@ class Genie
         // Add genie folder last, so they can be overridden
         $viewFolders[] = trailingslashit(dirname(__FILE__)).'Views';
 
-        Registry::push('genie_config','view_folders', $viewFolders);
+        $this->addComponent(WordPress::class);
 
-        $this->fill([
-            'components' => [
-                WordPress::class,
-            ],
-            'filename'   => $filename,
-            'folder'     => $folder,
-            'type'       => $type,
-        ]);
+        Registry::push('genie_config', 'view_folders', $viewFolders);
+        Registry::push('genie_config', 'filename', $filename);
+        Registry::push('genie_config', 'folder', $folder);
+        Registry::push('genie_config', 'type', $type);
+        Registry::push('genie_config', 'hook_prefix', 'genie_');
     }
 
 
 
     /**
-     * What to do on activation
+     * What to do on activation?
      */
     public static function activation()
     {
-        do_action('genie_activation');
+        do_action(Genie::hookName('activation'));
         flush_rewrite_rules();
     }
 
@@ -103,7 +93,7 @@ class Genie
      */
     public static function deactivation()
     {
-        do_action('genie_deactivation');
+        do_action(Genie::hookName('deactivation'));
     }
 
 
@@ -115,13 +105,13 @@ class Genie
      */
     public static function getComponents(): array
     {
-        return Registry::get('genie_config', 'components');
+        return Registry::get('genie_config', 'components', []);
     }
 
 
 
     /**
-     * get the filename stored in the registry
+     * Get the filename stored in the registry
      *
      * @return string
      */
@@ -133,11 +123,49 @@ class Genie
 
 
     /**
+     * Get the folder stored in the registry
+     *
+     * @return string
+     */
+    public static function getFolder(): string
+    {
+        return Registry::get('genie_config', 'folder');
+    }
+
+
+
+    /**
+     * Get the defined Hook prefix.
+     *
+     * @return string
+     */
+    public static function getHookPrefix(): string
+    {
+        return Registry::get('genie_config', 'hook_prefix');
+    }
+
+
+
+    /**
+     * Add the prefix to a hook or filter name
+     *
+     * @param  string  $name
+     *
+     * @return string
+     */
+    public static function hookName(string $name): string
+    {
+        return static::getHookPrefix().$name;
+    }
+
+
+
+    /**
      * What to do on uninstall
      */
     public static function uninstall()
     {
-        do_action('genie_uninstall');
+        do_action(Genie::hookName('uninstall'));
     }
 
 
@@ -145,19 +173,13 @@ class Genie
     /**
      * Add a component into Genie
      *
-     * @param  string  $component
+     * @param  string  $component  classname
      *
      * @return $this
      */
     public function addComponent(string $component): Genie
     {
-        $components = $this->components;
-
-        if ( ! in_array($component, $components)) {
-            $components[] = $component;
-        }
-
-        $this->components = $components;
+        $this->withComponents([$component]);
 
         return $this;
     }
@@ -171,7 +193,7 @@ class Genie
      */
     public function enableAjaxHandler(string $actionName = 'ajax'): Genie
     {
-        Registry::push('genie_config','ajax_action', $actionName);
+        Registry::push('genie_config', 'ajax_action', $actionName);
 
         return $this->addComponent(AjaxHandler::class);
     }
@@ -188,8 +210,8 @@ class Genie
      */
     public function enableApiHandler(string $pathName = 'api', string $actionName = 'genie_api'): Genie
     {
-        Registry::push('genie_config','api_path', $pathName);
-        Registry::push('genie_config','api_action', $actionName);
+        Registry::push('genie_config', 'api_path', $pathName);
+        Registry::push('genie_config', 'api_action', $actionName);
 
         return $this->addComponent(ApiHandler::class);
     }
@@ -199,13 +221,13 @@ class Genie
     /**
      * Enable Background Jobs
      *
-     * @param  string  $variableName  . The name of the variable used to trigger a background job. Defaults to "genie_bj_id"
+     * @param  string  $variableName  The name of the variable used to trigger a background job. Defaults to "genie_bj_id"
      *
      * @return Genie
      */
     public function enableBackgroundJobs(string $variableName = 'genie_bj_id'): Genie
     {
-        Registry::push('genie_config','bj_id', $variableName);
+        Registry::push('genie_config', 'bj_id', $variableName);
 
         return $this->addComponent(BackgroundJob::class);
     }
@@ -233,10 +255,10 @@ class Genie
      */
     public function enableDeploymentHandler(string $folder = 'src/php/Releases'): Genie
     {
-        $folder = trailingslashit($this->folder).$folder;
+        $folder = trailingslashit(static::getFolder()).$folder;
 
         if (file_exists($folder)) {
-            Registry::push('genie_config','release_folder', $folder);
+            Registry::push('genie_config', 'release_folder', $folder);
         }
 
         return $this->addComponent(Deploy::class);
@@ -253,7 +275,7 @@ class Genie
      */
     public function enableSessions(string $name = 'genie_session'): Genie
     {
-        Registry::push('genie_config','session_name', $name);
+        Registry::push('genie_config', 'session_name', $name);
 
         return $this->addComponent(Session::class);
     }
@@ -263,13 +285,29 @@ class Genie
     /**
      * Set the __FILE__ for the plugin - this is needed for activation, deactivation and uninstall hooks
      *
-     * @param $filename
+     * @param  string  $filename
      *
      * @return $this
      */
-    public function setFilename($filename): Genie
+    public function setFilename(string $filename): Genie
     {
-        $this->filename = $filename;
+        Registry::push('genie_config', 'filename', $filename);
+
+        return $this;
+    }
+
+
+
+    /**
+     * Set the Hook prefix for all actions and filters
+     *
+     * @param  string  $hook_prefix
+     *
+     * @return $this
+     */
+    public function setHookPrefix(string $hook_prefix): Genie
+    {
+        Registry::push('genie_config', 'hook_prefix', $hook_prefix);
 
         return $this;
     }
@@ -281,11 +319,9 @@ class Genie
      */
     public function start()
     {
-        // Load and stash our configuration so we can use it in static methods
-        $config = apply_filters('genie_config', $this->getData());
-        foreach ($config as $index => $value ) {
-            Registry::push('genie_config', $index,$value);
-        }
+        do_action(Genie::hookName('starting'));
+
+        $config = Registry::get('genie_config');
 
         // Load Required Genie Components
         View::setup();
@@ -300,6 +336,7 @@ class Genie
         }
 
         //Load all our classes.
+
         if (is_array($config['components'])) {
             foreach ($config['components'] as $class) {
                 if (method_exists($class, 'setup')) {
@@ -323,7 +360,7 @@ class Genie
                 ->run([static::class, 'deactivation']);
         }
         // Send a message to the outside world!
-        do_action('genie_started');
+        do_action(Genie::hookName('started'));
     }
 
 
@@ -337,7 +374,7 @@ class Genie
      */
     public function type(string $type): Genie
     {
-        $this->type = $type;
+        Registry::push('genie_config', 'type', $type);
 
         return $this;
     }
@@ -353,7 +390,8 @@ class Genie
      */
     public function withComponents(array $components): Genie
     {
-        $this->components = array_merge($this->components, $components);
+        $currentComponents = static::getComponents();
+        Registry::push('genie_config', 'components', array_merge($currentComponents, $components));
 
         return $this;
     }

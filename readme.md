@@ -22,12 +22,13 @@ Version 1.1.1
 
 ### 2.0.0
 
-- `CustomPost` methods `beforeSave`, `afterSave`, `checkValidity`, `beforeCache`, `afterRead` and `override`  changed to protected.
-- `CustomPost` method `preDelete` renamed to `beforeDelete` and made protected
+- `CustomPost` methods `beforeSave`, `afterSave`, `checkValidity`, `beforeCache`, `afterRead` and `override` visibility changed to `protected`.
+- `CustomPost` method `preDelete` renamed to `beforeDelete` and visibility changed to `protected`
 - `CustomPost` method `save` return `$this` rather than the ID
 - Attaching schema to a `CustomPost` is now handled in `CreateSchema`
 - Missing `getActionName` added to `AjaxHandler`
--
+- Added Field filters and actions `formatValue`, `loadField`, `loadValue`, `prepareField`, `renderField`, `updateField`, `updateValue`, `validateAttachment` and `validateValue`
+- new `setHookPrefix` method on `Genie` that will prefix all hooks and filters.
 
 ### 1.1.1
 - Removed dependencies for Laravel Collection and Symphony EnglishInflector

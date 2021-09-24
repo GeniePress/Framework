@@ -2,6 +2,7 @@
 
 namespace GeniePress\Abstracts;
 
+use GeniePress\Genie;
 use GeniePress\Traits\HasData;
 use GeniePress\Utilities\ConvertString;
 use GeniePress\Utilities\HookInto;
@@ -118,7 +119,7 @@ abstract class Field
 
 
     /**
-     * Set the Append
+     * Set append string
      *
      * @param  string  $string
      *
@@ -159,6 +160,13 @@ abstract class Field
 
 
 
+    /**
+     * For use with Genie - Sets this as a display only so it's not attached to objects
+     *
+     * @param $displayOnly
+     *
+     * @return $this
+     */
     public function displayOnly($displayOnly): Field
     {
         return $this->set('displayOnly', $displayOnly);
@@ -168,8 +176,11 @@ abstract class Field
 
     /**
      * Handy shortcut to ACF
+     * https://www.advancedcustomfields.com/resources/acf-format_value/
      *
-     * @param  callable  $callable
+     * callable accepts
+     *
+     * @param  callable  $callable  Accepts $value, $post_id, $field
      *
      * @return $this
      */
@@ -190,8 +201,8 @@ abstract class Field
     public function generate($parent_key): array
     {
         // Allow the defaults to be filtered
-        apply_filters('genie_field_generate', $this);
-        apply_filters('genie_field_generate_'.$this->type, $this);
+        apply_filters(Genie::hookName('field_generate'), $this);
+        apply_filters(Genie::hookName('field_generate_'.$this->type), $this);
 
         $key = $this->key;
         if ( ! $key) {
@@ -306,8 +317,9 @@ abstract class Field
 
     /**
      * Handy shortcut to ACF
+     * https://www.advancedcustomfields.com/resources/acf-load_field/
      *
-     * @param  callable  $callable
+     * @param  callable  $callable  accepts $field
      *
      * @return $this
      */
@@ -320,8 +332,9 @@ abstract class Field
 
     /**
      * Handy shortcut to ACF
+     * https://www.advancedcustomfields.com/resources/acf-load_value/
      *
-     * @param  callable  $callable
+     * @param  callable  $callable  accepts  $value, $post_id, $field
      *
      * @return $this
      */
@@ -333,7 +346,7 @@ abstract class Field
 
 
     /**
-     * Allows overriding wordpress fields
+     * Allows overriding WordPress fields
      *
      * @param $field
      *
@@ -348,8 +361,9 @@ abstract class Field
 
     /**
      * Handy shortcut to ACF
+     * https://www.advancedcustomfields.com/resources/acf-prepare_field/
      *
-     * @param  callable  $callable
+     * @param  callable  $callable  accepts $field
      *
      * @return $this
      */
@@ -389,9 +403,10 @@ abstract class Field
 
 
     /**
-     * Handy shortcut to ACF
+     * Handy shortcut to ACF Render Field
+     * https://www.advancedcustomfields.com/resources/acf-render_field/
      *
-     * @param  callable  $callable
+     * @param  callable  $callable  accepts $field
      *
      * @return $this
      */
@@ -449,8 +464,9 @@ abstract class Field
 
     /**
      * Handy shortcut to ACF
+     * https://www.advancedcustomfields.com/resources/acf-update_field/
      *
-     * @param  callable  $callable
+     * @param  callable  $callable  accepts  $field
      *
      * @return $this
      */
@@ -463,8 +479,9 @@ abstract class Field
 
     /**
      * Handy shortcut to ACF
+     * https://www.advancedcustomfields.com/resources/acf-update_value/
      *
-     * @param  callable  $callable
+     * @param  callable  $callable  accepts $value, $post_id, $field, $original
      *
      * @return $this
      */
@@ -477,8 +494,9 @@ abstract class Field
 
     /**
      * Handy shortcut to ACF
+     * https://www.advancedcustomfields.com/resources/acf-validate_attachment/
      *
-     * @param  callable  $callable
+     * @param  callable  $callable  accepts $errors, $file, $attachment, $field, $context
      *
      * @return $this
      */
@@ -491,8 +509,9 @@ abstract class Field
 
     /**
      * Handy shortcut to ACF
+     * https://www.advancedcustomfields.com/resources/acf-validate_value/
      *
-     * @param  callable  $callable
+     * @param  callable  $callable  accepts $valid, $value, $field, $input_name
      *
      * @return $this
      */

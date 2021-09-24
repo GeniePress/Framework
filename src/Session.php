@@ -23,7 +23,7 @@ class Session implements GenieComponent
         // Run once everything has been setup
         HookInto::action('after_setup_theme')
             ->run(function () {
-                $sessionName = apply_filters('genie_session_name', Registry::get('genie_config', 'session_name'));
+                $sessionName = apply_filters(Genie::hookName('session_name'), Registry::get('genie_config', 'session_name'));
 
                 session_name($sessionName);
 
@@ -31,10 +31,10 @@ class Session implements GenieComponent
                     session_start();
                 }
 
-                $maxTime      = apply_filters('genie_session_max_time', ini_get("session.gc_maxlifetime"));
-                $cookieDomain = apply_filters('genie_session_cookie_domain', COOKIE_DOMAIN);
-                $secure       = apply_filters('genie_session_secure', true);
-                $httpOnly     = apply_filters('genie_session_http_only', true);
+                $maxTime      = apply_filters(Genie::hookName('session_max_time'), ini_get("session.gc_maxlifetime"));
+                $cookieDomain = apply_filters(Genie::hookName('session_cookie_domain'), COOKIE_DOMAIN);
+                $secure       = apply_filters(Genie::hookName('session_secure'), true);
+                $httpOnly     = apply_filters(Genie::hookName('session_http_only'), true);
                 setcookie(session_name(), session_id(), time() + $maxTime, '/', $cookieDomain, $secure, $httpOnly);
 
                 // Last request was more than $maxTime seconds ago?
@@ -65,7 +65,7 @@ class Session implements GenieComponent
             });
 
         // Plug the session into all views
-        HookInto::filter('genie_view_variables')
+        HookInto::filter(Genie::hookName('view_variables'))
             ->run(function ($vars) {
                 return array_merge($vars, ['_session' => $_SESSION]);
             });
@@ -107,7 +107,7 @@ class Session implements GenieComponent
      */
     public static function processVariables()
     {
-        $fields = apply_filters('genie_session_parse_request', []);
+        $fields = apply_filters(Genie::hookName('session_parse_request'), []);
 
         foreach ($fields as $field) {
             if (isset($_REQUEST[$field])) {

@@ -49,7 +49,7 @@ class AjaxHandler implements GenieComponent
                     ->run(function () use ($action) {
                         Request::maybeParseInput();
 
-                        do_action('genie_received_ajax_request', $action, Request::getData());
+                        do_action(Genie::hookName('received_ajax_request'), $action, Request::getData());
 
                         $requestPath = Request::get('request');
 
@@ -130,7 +130,7 @@ class AjaxHandler implements GenieComponent
         /**
          * create the ajax_url function in twig that can prefix the right path, and add the nonce.
          */
-        HookInto::filter('genie_view_twig')
+        HookInto::filter(Genie::hookName('view_twig'))
             ->run(function (Environment $twig) {
                 $function = new TwigFunction('ajax_url', [static::class, 'generateUrl']);
                 $twig->addFunction($function);
@@ -198,7 +198,7 @@ class AjaxHandler implements GenieComponent
     {
         if (!static::$action) {
 
-            static::$action = apply_filters('genie_ajax_action',Registry::get('genie_config','ajax_action'));
+            static::$action = apply_filters(Genie::hookName('ajax_action'),Registry::get('genie_config','ajax_action'));
         }
         return static::$action;
     }

@@ -12,13 +12,6 @@ class Options
 {
 
     /**
-     * the option key
-     *
-     * @var string
-     */
-    private static $option = 'genie_options';
-
-    /**
      * options array
      *
      * @var null
@@ -30,12 +23,12 @@ class Options
     /**
      * get an option
      *
-     * @param      $option
-     * @param  bool  $default
+     * @param  string  $option
+     * @param  mixed  $default
      *
      * @return bool|mixed
      */
-    public static function get($option, $default = false)
+    public static function get(string $option, $default = false)
     {
         static::load();
         if ( ! isset(static::$options[$option])) {
@@ -50,10 +43,10 @@ class Options
     /**
      * set an option
      *
-     * @param $option
-     * @param $value
+     * @param  string  $option
+     * @param  mixed  $value
      */
-    public static function set($option, $value)
+    public static function set(string $option, $value)
     {
         static::load();
         static::$options[$option] = $value;
@@ -63,14 +56,24 @@ class Options
 
 
     /**
+     * get the key used for options
+     *
+     * @return string
+     */
+    protected static function getKey(): string
+    {
+        return apply_filters(Genie::hookName('option_key'), 'genie_options');
+    }
+
+
+
+    /**
      * load options into memory
      */
     protected static function load()
     {
-        $key = apply_filters('genie_option_key', static::$option);
-
         if (is_null(static::$options)) {
-            static::$options = get_option($key);
+            static::$options = get_option(static::getKey());
         }
     }
 
@@ -81,9 +84,7 @@ class Options
      */
     protected static function save()
     {
-        $key = apply_filters('genie_option_key', static::$option);
-
-        update_option($key, static::$options);
+        update_option(static::getKey(), static::$options);
     }
 
 }
