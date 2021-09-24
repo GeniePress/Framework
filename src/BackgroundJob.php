@@ -47,7 +47,7 @@ class BackgroundJob implements GenieComponent
     public static function setup()
     {
         //  Check if we're processing a background Job
-        $variableName = apply_filters('genie_bj_id', Registry::get('genie_config','bj_id'));
+        $variableName = static::getVariableName();
 
         if ( ! Request::has($variableName)) {
             return;
@@ -88,7 +88,7 @@ class BackgroundJob implements GenieComponent
                     try {
                         call_user_func_array($callback, $args);
                     } catch (Throwable $exception) {
-                        do_action('genie_background_job_error', $exception, $callback, $args, $calls);
+                        do_action(Genie::hookName('background_job_error'), $exception, $callback, $args, $calls);
                         break;
                     }
                 }
@@ -162,7 +162,7 @@ class BackgroundJob implements GenieComponent
             'post_content' => base64_encode(serialize($this->calls)),
         ]);
 
-        $variableName = apply_filters('genie_bj_id', Registry::get('genie_config','bj_id'));
+        $variableName = static::getVariableName();
 
         $url = home_url()."/?{$variableName}={$id}";
 
@@ -177,6 +177,17 @@ class BackgroundJob implements GenieComponent
         } else {
             get_headers($url);
         }
+    }
+
+
+
+    /**
+     * get the variable name used for the background job
+     * @return mixed|void
+     */
+    protected static function getVariableName()
+    {
+        return apply_filters(Genie::hookName('bj_id'), Registry::get('genie_config', 'bj_id'));
     }
 
 }

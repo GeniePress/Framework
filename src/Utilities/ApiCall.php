@@ -7,8 +7,7 @@ use GeniePress\Tools;
 use JsonSerializable;
 
 /**
- * Simple wrapper for Wordpress wp_remote_post
- * Class API
+ * Simple wrapper for WordPress wp_remote_post
  *
  * @package GeniePress
  */
@@ -30,14 +29,14 @@ class ApiCall implements JsonSerializable
     var $method = 'POST';
 
     /**
-     * timeout in seconds
+     * Timeout in seconds
      *
      * @var int
      */
     var $timeout = 10;
 
     /**
-     * how many redirections allowed?
+     * How many redirections allowed?
      *
      * @var int
      */

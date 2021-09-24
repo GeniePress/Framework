@@ -67,7 +67,7 @@ class WordPress implements GenieComponent
             });
 
         // Hook into the views render function and make the session variables available to twig
-        HookInto::filter('genie_get_site_var')
+        HookInto::filter(Genie::hookName('get_site_var'))
             ->run(function ($vars) {
                 return array_merge($vars, ['query_vars' => static::$query_vars]);
             });

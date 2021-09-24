@@ -17,7 +17,7 @@ class CacheBust implements GenieComponent
 {
 
     /**
-     * Main Wordpress Hook for the Theme
+     * Main WordPress Hook for the Theme
      *
      * @throws Exception
      */
@@ -31,7 +31,7 @@ class CacheBust implements GenieComponent
 
 
     /**
-     * Append the date and time at the end of enqueued scripts / styles so we can cache bust !
+     * Append the date and time at the end of enqueued scripts & styles, so we can cache bust !
      *
      * @param  string  $src
      *
@@ -48,7 +48,7 @@ class CacheBust implements GenieComponent
         }
 
         // Check if script lives on this domain. Can't rewrite external scripts, they won't work.
-        $base_url = apply_filters('cache_busting_path_base_url', $wp_scripts->base_url, $src);
+        $base_url = apply_filters(Genie::hookName('cache_busting_path_base_url'), $wp_scripts->base_url, $src);
         if ( ! strstr($src, $base_url)) {
             return $src;
         }
@@ -66,7 +66,7 @@ class CacheBust implements GenieComponent
         if ( ! file_exists($file)) {
             return $src;
         }
-        $time_format   = apply_filters('genie_loader_src_time_format', 'Y-m-d_G-i');
+        $time_format   = apply_filters(Genie::hookName('cache_busting_src_time_format'), 'Y-m-d_G-i');
         $modified_time = filemtime($file);
         $dt            = new DateTime('@'.$modified_time);
         $time          = $dt->format($time_format);

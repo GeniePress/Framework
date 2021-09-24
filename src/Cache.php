@@ -13,7 +13,7 @@ class Cache
     /**
      * Clear any api call cache
      */
-    public static function clearAPiCache()
+    public static function clearApiCache()
     {
         global $wpdb;
 
@@ -56,6 +56,6 @@ class Cache
      */
     public static function getCachePrefix(): string
     {
-        return apply_filters('genie_get_cache_prefix', 'gcache');
+        return apply_filters(Genie::hookName('get_cache_prefix'), 'gcache');
     }
 }

@@ -3,6 +3,7 @@
 namespace GeniePress\Exceptions;
 
 use Exception;
+use GeniePress\Genie;
 use GeniePress\Traits\HasData;
 use JsonSerializable;
 use Throwable;
@@ -29,7 +30,7 @@ class GenieException extends Exception implements JsonSerializable
     function __construct($message = '', $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        do_action('genie_exception', $this);
+        do_action(Genie::hookName('exception'), $this);
     }
 
 

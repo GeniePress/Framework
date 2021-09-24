@@ -33,17 +33,17 @@ class Deploy implements GenieComponent
     public static function deploy()
     {
         static::log('Starting Deployment');
-        do_action('genie_before_deploy');
+        do_action(Genie::hookName('before_deploy'));
         static::log('Updating Tables');
         static::updateDatabase();
         static::log('Loading Releases');
         static::loadReleases();
         static::log('Clearing Cache');
         Cache::clearPostCache();
-        Cache::clearAPiCache();
+        Cache::clearApiCache();
         static::log('Flushing rewrite rules');
         flush_rewrite_rules(true);
-        do_action('genie_after_deploy');
+        do_action(Genie::hookName('after_deploy'));
         static::log('Deployment Complete');
     }
 
@@ -68,7 +68,7 @@ class Deploy implements GenieComponent
      */
     protected static function loadReleases()
     {
-        $releaseFolder = apply_filters('genie_release_folder', Registry::get('genie_config','release_folder'));
+        $releaseFolder = apply_filters(Genie::hookName('release_folder'), Registry::get('genie_config', 'release_folder'));
 
         if ( ! $releaseFolder || ! file_exists($releaseFolder)) {
             return;
@@ -93,7 +93,7 @@ class Deploy implements GenieComponent
     protected static function updateDatabase()
     {
         require_once(ABSPATH.'wp-admin/includes/upgrade.php');
-        $sqlStatements = apply_filters('genie_update_database', []);
+        $sqlStatements = apply_filters(Genie::hookName('update_database'), []);
         foreach ($sqlStatements as $sqlStatement) {
             dbDelta($sqlStatement);
         }

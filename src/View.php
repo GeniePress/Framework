@@ -68,9 +68,9 @@ class View implements GenieComponent
         // Note the sequence. this runs before anything else
         HookInto::action('init', 1)
             ->run(function () {
-                $debug     = apply_filters('genie_view_debug', WP_DEBUG);
-                $cache     = apply_filters('genie_view_cache', ! WP_DEBUG);
-                $pathArray = apply_filters('genie_view_folders', Registry::get('genie_config', 'view_folders'));
+                $debug     = apply_filters(Genie::hookName('view_debug'), WP_DEBUG);
+                $cache     = apply_filters(Genie::hookName('view_cache'), ! WP_DEBUG);
+                $pathArray = apply_filters(Genie::hookName('view_folders'), Registry::get('genie_config', 'view_folders'));
 
                 $fileLoader = new FilesystemLoader($pathArray);
                 $loader     = new ChainLoader([$fileLoader]);
@@ -98,7 +98,7 @@ class View implements GenieComponent
                 $filter = new TwigFilter('wpautop', 'wpautop');
                 $twig->addFilter($filter);
 
-                self::$twig = apply_filters('genie_view_twig', $twig);
+                self::$twig = apply_filters(Genie::hookName('view_twig'), $twig);
             });
 
         // The shortcode genie_view allows you to have a twig template embedded in content
@@ -253,7 +253,7 @@ class View implements GenieComponent
      */
     public function render(): string
     {
-        $site = apply_filters('genie_get_site_var', [
+        $site = apply_filters(Genie::hookName('get_site_var'), [
             'urls' => [
                 'theme' => get_stylesheet_directory_uri(),
                 'ajax'  => admin_url('admin-ajax.php'),
@@ -262,7 +262,7 @@ class View implements GenieComponent
         ]);
 
         $vars = array_merge(['_site' => $site], $this->vars);
-        $vars = apply_filters('genie_view_variables', $vars);
+        $vars = apply_filters(Genie::hookName('view_variables'), $vars);
 
         try {
             if ($this->templateType === 'string') {
@@ -294,7 +294,7 @@ class View implements GenieComponent
         $upload     = wp_upload_dir();
         $upload_dir = $upload['basedir'];
 
-        return apply_filters('genie_view_cache_folder', $upload_dir.'/twig_cache');
+        return apply_filters(Genie::hookName('view_cache_folder'), $upload_dir.'/twig_cache');
     }
 
 }

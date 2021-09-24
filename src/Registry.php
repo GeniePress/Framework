@@ -14,7 +14,7 @@ class Registry
     /**
      * array of values
      *
-     * @var
+     * @var array
      */
     private static $registry = [];
 
@@ -23,12 +23,13 @@ class Registry
     /**
      * get a value from the registry
      *
-     * @param  $group
-     * @param  $index
+     * @param  string  $group
+     * @param  string|null  $index
+     * @param  null  $default
      *
      * @return mixed|null
      */
-    public static function get($group, $index = null)
+    public static function get(string $group, string $index = null, $default = null)
     {
         if (is_null($index)) {
             if ( ! isset(static::$registry[$group])) {
@@ -42,7 +43,7 @@ class Registry
             return static::$registry[$group][$index];
         }
 
-        return null;
+        return $default;
     }
 
 
@@ -50,11 +51,11 @@ class Registry
     /**
      * Add a value to a registry array
      *
-     * @param $group
-     * @param $index
-     * @param $value
+     * @param  string  $group
+     * @param  string  $index
+     * @param  mixed  $value
      */
-    public static function push($group, $index, $value)
+    public static function push(string $group, string $index, $value)
     {
         if ( ! isset(static::$registry[$group])) {
             static::$registry[$group] = [];
@@ -67,10 +68,10 @@ class Registry
     /**
      * Set a value in the registry
      *
-     * @param $group
-     * @param $value
+     * @param  string  $group
+     * @param  mixed  $value
      */
-    public static function set($group, $value)
+    public static function set(string $group, $value)
     {
         static::$registry[$group] = $value;
     }

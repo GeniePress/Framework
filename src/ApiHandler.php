@@ -35,8 +35,9 @@ class ApiHandler implements GenieComponent
          */
         HookInto::action('init')
             ->run(function () {
-                $path   = apply_filters('genie_api_path', Registry::get('genie_config', 'api_path'));
-                $action = apply_filters('genie_api_action', Registry::get('genie_config', 'api_action'));
+
+                $path   = static::getPath();
+                $action = apply_filters(Genie::hookName('api_action'), Registry::get('genie_config', 'api_action'));
 
                 add_rewrite_rule($path.'/(.*)$', 'wp-admin/admin-ajax.php?action='.$action.'&route=$1', 'top');
 
@@ -45,7 +46,7 @@ class ApiHandler implements GenieComponent
                     ->run(function () use ($action) {
                         Request::maybeParseInput();
 
-                        do_action('genie_received_api_request', $action, Request::getData());
+                        do_action(Genie::hookName('received_api_request'), $action, Request::getData());
 
                         $route = Request::get('route');
 
@@ -119,7 +120,7 @@ class ApiHandler implements GenieComponent
         /**
          * Create the api_url function in twig that can prefix the right path, and add the nonce.
          */
-        HookInto::filter('genie_view_twig')
+        HookInto::filter(Genie::hookName('view_twig'))
             ->run(function (Environment $twig) {
                     $function = new TwigFunction('api_url', [static::class, 'generateUrl']);
                     $twig->addFunction($function);
@@ -153,12 +154,19 @@ class ApiHandler implements GenieComponent
      */
     public static function generateUrl($route): string
     {
-        $path = apply_filters('genie_api_path', Registry::get('genie_config', 'api_path'));
-
-        return home_url($path.'/'.$route);
+        return home_url(static::getPath().'/'.$route);
     }
 
 
+
+    /**
+     * get the api Path
+     *
+     * @return string
+     */
+        protected static function getPath(): string {
+                  return  apply_filters(Genie::hookName('api_path'), Registry::get('genie_config', 'api_path'));
+        }
 
     /**
      * Register an ajax callback function
@@ -174,5 +182,8 @@ class ApiHandler implements GenieComponent
             'callback' => $callback,
         ];
     }
+
+
+
 
 }
