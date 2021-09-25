@@ -176,12 +176,14 @@ class SendEmail
             return $this->body;
         }
 
+        $internalErrors = libxml_use_internal_errors(true);
+
         $htmlDoc     = new InlineStyle($this->body);
         $styleSheets = $htmlDoc->extractStylesheets();
         foreach ($styleSheets as $styleSheet) {
             $htmlDoc->applyStylesheet($styleSheet);
         }
-
+        libxml_use_internal_errors($internalErrors);
         return $htmlDoc->getHTML();
     }
 
