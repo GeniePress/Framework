@@ -13,14 +13,14 @@ class Cache
     /**
      * Clear any api call cache
      */
-    public static function clearApiCache()
+    public static function clearApiCache(): void
     {
         global $wpdb;
 
         $prefix = static::getCachePrefix();
 
         // Delete api cache
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name like '%{$prefix}_api%'  ");
+        $wpdb->query("DELETE FROM $wpdb->options WHERE option_name like '%{$prefix}_api%'  ");
     }
 
 
@@ -30,7 +30,7 @@ class Cache
      *
      * @param  int|array|null  $id
      */
-    public static function clearPostCache($id = null)
+    public static function clearPostCache($id = null): void
     {
         global $wpdb;
 
@@ -44,7 +44,7 @@ class Cache
         $prefix = static::getCachePrefix();
 
         // Delete post cache
-        $wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE meta_key LIKE '{$prefix}%'  $where ");
+        $wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_key LIKE '$prefix%'  $where");
     }
 
 

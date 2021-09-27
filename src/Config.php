@@ -12,18 +12,18 @@ class Config
     /**
      * Get a config value
      *
-     * @param  string  $value
+     * @param  string  $constant
      * @param  mixed  $default
      *
      * @return bool|mixed
      */
-    public static function get(string $value, $default = false)
+    public static function get(string $constant, $default = false)
     {
-        if ( ! defined($value)) {
+        if ( ! defined($constant)) {
             return $default;
         }
 
-        return constant($value);
+        return constant($constant);
     }
 
 }

@@ -42,7 +42,9 @@ class Tools
         try {
             is_callable($callback, false, $name);
 
-            // Closure or normal function
+            /**
+             * @noinspection PhpConditionAlreadyCheckedInspection
+             */
             if ($callback instanceof Closure || strpos($name, "::") === false) {
                 $reflection = new ReflectionFunction($callback);
             } else {
@@ -68,7 +70,7 @@ class Tools
     {
         $pieces = parse_url($url);
         $domain = $pieces['host'] ?? $pieces['path'];
-        if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs)) {
+        if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z.]{2,6})$/i', $domain, $regs)) {
             return $regs['domain'];
         }
 
@@ -96,7 +98,7 @@ class Tools
     {
         $headers = [];
         foreach ($_SERVER as $key => $value) {
-            if (substr($key, 0, 5) <> 'HTTP_') {
+            if (strpos($key, 'HTTP_') !== 0) {
                 continue;
             }
             $header           = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))));
@@ -118,7 +120,7 @@ class Tools
     public static function isValidJson($jsonString): array
     {
         $data      = json_decode($jsonString);
-        $isJson    = $data && $jsonString != $data;
+        $isJson    = $data && $jsonString !== $data;
         $validJson = $isJson && json_last_error() === JSON_ERROR_NONE;
 
         return [$isJson, $validJson];
@@ -150,7 +152,7 @@ class Tools
     public static function maybeConvertFromJson($string)
     {
         $json = json_decode($string);
-        if (json_last_error() == JSON_ERROR_NONE) {
+        if (json_last_error() === JSON_ERROR_NONE) {
             return $json;
         }
 
@@ -169,8 +171,8 @@ class Tools
     public static function maybeConvertToJson($string): string
     {
         if (is_string($string)) {
-            $json = json_decode($string);
-            if (json_last_error() == JSON_ERROR_NONE) {
+            json_decode($string);
+            if (json_last_error() === JSON_ERROR_NONE) {
                 return $string;
             }
         }

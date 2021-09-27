@@ -8,7 +8,7 @@ class RangeField extends NumberField
     /**
      * Set defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('range');

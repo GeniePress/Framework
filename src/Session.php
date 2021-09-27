@@ -20,7 +20,7 @@ class Session implements GenieComponent
      */
     public static function setup()
     {
-        // Run once everything has been setup
+        // Run once everything has been set up
         HookInto::action('after_setup_theme')
             ->run(function () {
                 $sessionName = apply_filters(Genie::hookName('session_name'), Registry::get('genie_config', 'session_name'));
@@ -91,7 +91,7 @@ class Session implements GenieComponent
     /**
      * Destroys the session
      */
-    public static function destroy()
+    public static function destroy(): void
     {
         // unset $_SESSION variable for the run-time
         session_unset();
@@ -103,9 +103,62 @@ class Session implements GenieComponent
 
 
     /**
+     * Get a value from the session
+     *
+     * @param $var
+     * @param  mixed  $default
+     *
+     * @return array|bool|mixed
+     */
+    public static function get($var, $default = false)
+    {
+        return self::find($var, $default);
+    }
+
+
+
+    /**
+     * Get the session ID
+     *
+     * @return string
+     */
+    public static function getSessionID(): string
+    {
+        return session_id();
+    }
+
+
+
+    /**
+     * Check if the session has a value
+     *
+     * @param $field
+     *
+     * @return bool
+     */
+    public static function has($field): bool
+    {
+        return (bool) self::find($field);
+    }
+
+
+
+    /**
+     * Check if there is an active session
+     *
+     * @return bool
+     */
+    public static function isSessionActive(): bool
+    {
+        return session_status() === PHP_SESSION_ACTIVE;
+    }
+
+
+
+    /**
      * Get the variables that needs to be saved, and then add them to the session.
      */
-    public static function processVariables()
+    public static function processVariables(): void
     {
         $fields = apply_filters(Genie::hookName('session_parse_request'), []);
 
@@ -124,12 +177,24 @@ class Session implements GenieComponent
 
 
     /**
+     * Remove a value for the session
+     *
+     * @param $var
+     */
+    public static function remove($var): void
+    {
+        unset($_SESSION[$var]);
+    }
+
+
+
+    /**
      * Save a value to the Session
      *
      * @param $var
      * @param $value
      */
-    public static function set($var, $value)
+    public static function set($var, $value): void
     {
         $_SESSION[$var] = $value;
     }
@@ -142,7 +207,7 @@ class Session implements GenieComponent
      * Session::get(object.property.index);
      *
      * @param $var
-     * @param  bool  $default
+     * @param  mixed  $default
      *
      * @return mixed
      */
@@ -155,11 +220,11 @@ class Session implements GenieComponent
         $lookAt = $_SESSION;
         $keys   = explode('.', $var);
         foreach ($keys as $key) {
-            if (is_object($lookAt) and property_exists($lookAt, $key)) {
+            if (is_object($lookAt) && property_exists($lookAt, $key)) {
                 $lookAt = $lookAt->$key;
                 continue;
             }
-            if (is_array($lookAt) and isset($lookAt[$key])) {
+            if (is_array($lookAt) && isset($lookAt[$key])) {
                 $lookAt = $lookAt[$key];
                 continue;
             }
@@ -167,71 +232,6 @@ class Session implements GenieComponent
         }
 
         return $lookAt;
-    }
-
-
-
-    /**
-     * Check if there is an active session
-     *
-     * @return bool
-     */
-    public static function isSessionActive(): bool
-    {
-        return session_status() === PHP_SESSION_ACTIVE;
-    }
-
-
-
-    /**
-     * Get a value from the session
-     *
-     * @param $var
-     * @param  bool  $default
-     *
-     * @return array|bool|mixed
-     */
-    public static function get($var, $default = false)
-    {
-        return self::find($var, $default);
-    }
-
-
-
-    /**
-     * Get the session ID
-     *
-     * @return string
-     */
-    public static function getSessionID()
-    {
-        return session_id();
-    }
-
-
-
-    /**
-     * Check if the session has a value
-     *
-     * @param $field
-     *
-     * @return bool
-     */
-    public static function has($field)
-    {
-        return self::find($field) ? true : false;
-    }
-
-
-
-    /**
-     * Remove a value for the session
-     *
-     * @param $var
-     */
-    public static function remove($var)
-    {
-        unset($_SESSION[$var]);
     }
 
 }

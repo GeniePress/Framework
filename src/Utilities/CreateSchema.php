@@ -39,7 +39,7 @@ class CreateSchema
 
     private $fields = [];
 
-    private $attachTo = null;
+    private $attachToClass;
 
 
 
@@ -80,7 +80,7 @@ class CreateSchema
      */
     public function attachTo($class): CreateSchema
     {
-        $this->attachTo = $class;
+        $this->attachToClass = $class;
 
         return $this;
     }
@@ -90,7 +90,7 @@ class CreateSchema
     /**
      * Helper function
      */
-    function dump()
+    public function dump(): void
     {
         Debug::dd($this->generateSchemaArray());
     }
@@ -98,7 +98,7 @@ class CreateSchema
 
 
     /**
-     * An Array of Wordpress elements to hide on Screen
+     * An Array of WordPress elements to hide on Screen
      * 'permalink',
      * 'the_content',
      * 'excerpt',
@@ -197,7 +197,7 @@ class CreateSchema
      * @param  int  $sequence  The activation hook priority
      * @param  bool  $onActivation  Should this be registered on activation as well? defaults to true
      */
-    function register(int $sequence = 20, bool $onActivation = true)
+    public function register(int $sequence = 20, bool $onActivation = true): void
     {
         $hook = HookInto::action('init', $sequence);
         if ($onActivation) {
@@ -218,7 +218,7 @@ class CreateSchema
      *
      * @return array
      */
-    function return(): array
+    public function return(): array
     {
         return $this->generateSchemaArray();
     }
@@ -291,7 +291,7 @@ class CreateSchema
 
     /**
      * Go through the field definitions and convert a name
-     * to a acf key where needed.
+     * to an acf key where needed.
      * We come at the 1st level.  We need to be careful of sub_fields
      * having the same name
      *
@@ -308,12 +308,14 @@ class CreateSchema
                     if (isset($statement['field'])) {
                         $name = $statement['field'];
                         // only do this if it's not a key
-                        if (substr($name, 0, 6) != 'field_') {
+                        if (strpos($name, 'field_') !== 0) {
                             $statement['field'] = $this->findNameInFieldsAndReturnKey($name, $fields);
                         }
                     }
                 }
+                unset($statement);
             }
+            unset($condition);
         }
         if (isset($field['sub_fields'])) {
             foreach ($field['sub_fields'] as &$subfield) {
@@ -368,6 +370,7 @@ class CreateSchema
         foreach ($fields as &$field) {
             $field = $this->convertNameToKey($field, $fields);
         }
+        unset($field);
 
         $schema = [
             'key'                   => $this->key,
@@ -382,11 +385,11 @@ class CreateSchema
             'hide_on_screen'        => $this->hide_on_screen,
         ];
 
-        if ($this->attachTo) {
+        if ($this->attachToClass) {
             /**
              * Parse the schema and build a map of the field name / keys
              * We will use this later when saving data.
-             * Problem with setting static::$schema here so we use the registry instead.
+             * Problem with setting static::$schema here, so we use the registry instead.
              * https://stackoverflow.com/questions/4577187/php-5-3-late-static-binding-doesnt-work-for-properties-when-defined-in-parent
              * This is called from CreateSchema
              *
@@ -409,8 +412,8 @@ class CreateSchema
                 $level1Fields[$level1Field['name']] = $level1Field;
             }
 
-            $registryFields[$this->attachTo]  = $level1Fields;
-            $registrySchemas[$this->attachTo] = $schema;
+            $registryFields[$this->attachToClass]  = $level1Fields;
+            $registrySchemas[$this->attachToClass] = $schema;
 
             Registry::set('fields', $registryFields);
             Registry::set('schemas', $registrySchemas);

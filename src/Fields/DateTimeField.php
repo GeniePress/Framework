@@ -8,7 +8,7 @@ class DateTimeField extends DateField
     /**
      * Set defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
 

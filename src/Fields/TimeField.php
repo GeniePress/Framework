@@ -8,7 +8,7 @@ class TimeField extends DateField
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('time_picker');

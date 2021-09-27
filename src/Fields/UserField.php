@@ -36,7 +36,7 @@ class UserField extends Field
 
 
     /**
-     * Limit to Wordpress Role
+     * Limit to WordPress Role
      *
      * @param  string  $role
      *
@@ -52,7 +52,7 @@ class UserField extends Field
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('user');

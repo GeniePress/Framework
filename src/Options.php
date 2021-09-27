@@ -16,7 +16,7 @@ class Options
      *
      * @var null
      */
-    private static $options = null;
+    private static $options;
 
 
 
@@ -31,11 +31,8 @@ class Options
     public static function get(string $option, $default = false)
     {
         static::load();
-        if ( ! isset(static::$options[$option])) {
-            return $default;
-        }
 
-        return static::$options[$option];
+        return static::$options[$option] ?? $default;
     }
 
 
@@ -46,7 +43,7 @@ class Options
      * @param  string  $option
      * @param  mixed  $value
      */
-    public static function set(string $option, $value)
+    public static function set(string $option, $value): void
     {
         static::load();
         static::$options[$option] = $value;
@@ -70,7 +67,7 @@ class Options
     /**
      * load options into memory
      */
-    protected static function load()
+    protected static function load(): void
     {
         if (is_null(static::$options)) {
             static::$options = get_option(static::getKey());
@@ -82,7 +79,7 @@ class Options
     /**
      * Save options
      */
-    protected static function save()
+    protected static function save(): void
     {
         update_option(static::getKey(), static::$options);
     }

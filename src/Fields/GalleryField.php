@@ -50,7 +50,7 @@ class GalleryField extends ImageField
     /**
      * Set defaults for this field
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('gallery');

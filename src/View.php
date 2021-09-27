@@ -13,6 +13,7 @@ use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
 use Twig\Source;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
  * Class View
@@ -98,6 +99,12 @@ class View implements GenieComponent
                 $filter = new TwigFilter('wpautop', 'wpautop');
                 $twig->addFilter($filter);
 
+                $function = new TwigFunction('__', '__');
+                $twig->addFunction($function);
+
+                $function = new TwigFunction('_x', '_x');
+                $twig->addFunction($function);
+
                 self::$twig = apply_filters(Genie::hookName('view_twig'), $twig);
             });
 
@@ -108,7 +115,7 @@ class View implements GenieComponent
                     'view' => '',
                 ], $incomingAttributes);
 
-                if ( ! $attributes->view) {
+                if ( ! $attributes['view']) {
                     if (isset($incomingAttributes[0])) {
                         $attributes['view'] = $incomingAttributes[0];
                     } else {
@@ -116,7 +123,7 @@ class View implements GenieComponent
                     }
                 }
 
-                return static::with($attributes->view)
+                return static::with($attributes['view'])
                     ->addVars($attributes)
                     ->render();
             });
@@ -129,12 +136,10 @@ class View implements GenieComponent
      *
      * @param  string  $template
      */
-    function __construct(string $template)
+    public function __construct(string $template)
     {
         $this->template     = $template;
-        $this->templateType = substr(strtolower($template), -5) === '.twig' ? 'file' : 'string';
-        $this->cache        = ! WP_DEBUG;
-        $this->debug        = WP_DEBUG;
+        $this->templateType = strtolower(substr($template, -5)) === '.twig' ? 'file' : 'string';
     }
 
 
@@ -213,7 +218,7 @@ class View implements GenieComponent
      * @return $this
      */
 
-    function disableShortcodes(): View
+    public function disableShortcodes(): View
     {
         $this->processShortcodes = false;
 
@@ -225,7 +230,7 @@ class View implements GenieComponent
     /**
      * Output the view rather than return it.
      */
-    public function display()
+    public function display(): void
     {
         echo $this->render();
     }
@@ -237,7 +242,7 @@ class View implements GenieComponent
      *
      * @return $this
      */
-    function enableShortcodes(): View
+    public function enableShortcodes(): View
     {
         $this->processShortcodes = true;
 

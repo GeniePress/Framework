@@ -46,7 +46,7 @@ class GoogleMapField extends Field
     /**
      * Set defaults for this field
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('google_map');

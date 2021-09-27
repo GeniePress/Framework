@@ -47,7 +47,7 @@ class AddShortcode
      *
      * @param  callable  $callback
      */
-    public function run(callable $callback)
+    public function run(callable $callback): void
     {
         add_shortcode($this->shortcode, $callback);
     }

@@ -2,6 +2,7 @@
 
 namespace GeniePress;
 
+use Exception;
 use GeniePress\Interfaces\GenieComponent;
 use GeniePress\Plugins\CLI;
 use WP_CLI;
@@ -17,6 +18,7 @@ class Deploy implements GenieComponent
     /**
      * Setup
      *
+     * @throws Exception
      */
     public static function setup()
     {
@@ -30,7 +32,7 @@ class Deploy implements GenieComponent
     /**
      * Run the Deployment Process
      */
-    public static function deploy()
+    public static function deploy(): void
     {
         static::log('Starting Deployment');
         do_action(Genie::hookName('before_deploy'));
@@ -54,7 +56,7 @@ class Deploy implements GenieComponent
      *
      * @param $message
      */
-    static function log($message)
+    public static function log($message): void
     {
         if (CLI::isEnabled()) {
             WP_CLI::log($message);
@@ -66,7 +68,7 @@ class Deploy implements GenieComponent
     /**
      * Load and Run Releases
      */
-    protected static function loadReleases()
+    protected static function loadReleases(): void
     {
         $releaseFolder = apply_filters(Genie::hookName('release_folder'), Registry::get('genie_config', 'release_folder'));
 
@@ -77,7 +79,7 @@ class Deploy implements GenieComponent
         $releases = Options::get('genie_releases', []);
 
         foreach (glob(trailingslashit($releaseFolder).'*.php') as $file) {
-            if ( ! in_array($file, $releases)) {
+            if ( ! in_array($file, $releases, true)) {
                 $releases[] = $file;
                 require_once($file);
             }
@@ -90,7 +92,7 @@ class Deploy implements GenieComponent
     /**
      * Update the database
      */
-    protected static function updateDatabase()
+    protected static function updateDatabase(): void
     {
         require_once(ABSPATH.'wp-admin/includes/upgrade.php');
         $sqlStatements = apply_filters(Genie::hookName('update_database'), []);

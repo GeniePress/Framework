@@ -17,9 +17,9 @@ class Genie
     /**
      * Genie constructor.
      *
-     * @param  string  $type plugin|theme
+     * @param  string  $type  plugin|theme
      */
-    function __construct(string $type = 'theme')
+    public function __construct(string $type = 'theme')
     {
         $filename = '';
         $folder   = '';
@@ -40,7 +40,7 @@ class Genie
         }
 
         // Add genie folder last, so they can be overridden
-        $viewFolders[] = trailingslashit(dirname(__FILE__)).'Views';
+        $viewFolders[] = trailingslashit(__DIR__).'Views';
 
         $this->addComponent(WordPress::class);
 
@@ -56,9 +56,9 @@ class Genie
     /**
      * What to do on activation?
      */
-    public static function activation()
+    public static function activation(): void
     {
-        do_action(Genie::hookName('activation'));
+        do_action(self::hookName('activation'));
         flush_rewrite_rules();
     }
 
@@ -91,9 +91,9 @@ class Genie
     /**
      * What to do on deactivation
      */
-    public static function deactivation()
+    public static function deactivation(): void
     {
-        do_action(Genie::hookName('deactivation'));
+        do_action(self::hookName('deactivation'));
     }
 
 
@@ -163,9 +163,9 @@ class Genie
     /**
      * What to do on uninstall
      */
-    public static function uninstall()
+    public static function uninstall(): void
     {
-        do_action(Genie::hookName('uninstall'));
+        do_action(self::hookName('uninstall'));
     }
 
 
@@ -317,9 +317,9 @@ class Genie
     /**
      * get Genie Going.
      */
-    public function start()
+    public function start(): void
     {
-        do_action(Genie::hookName('starting'));
+        do_action(self::hookName('starting'));
 
         $config = Registry::get('genie_config');
 
@@ -328,7 +328,7 @@ class Genie
 
         // We can't do anything without ACF
         if (ACF::isDisabled()) {
-            AddAdminNotice::error('GeniePress requires <a href="https://www.advancedcustomfields.com/">Advanced Custom Fields</a> to be installed and enabled')
+            AddAdminNotice::error(__('GeniePress requires <a href="https://www.advancedcustomfields.com/">Advanced Custom Fields</a> to be installed and enabled'))
                 ->isNotDismissible()
                 ->display();
 
@@ -336,7 +336,6 @@ class Genie
         }
 
         //Load all our classes.
-
         if (is_array($config['components'])) {
             foreach ($config['components'] as $class) {
                 if (method_exists($class, 'setup')) {
@@ -360,7 +359,7 @@ class Genie
                 ->run([static::class, 'deactivation']);
         }
         // Send a message to the outside world!
-        do_action(Genie::hookName('started'));
+        do_action(self::hookName('started'));
     }
 
 
@@ -390,8 +389,7 @@ class Genie
      */
     public function withComponents(array $components): Genie
     {
-        $currentComponents = static::getComponents();
-        Registry::push('genie_config', 'components', array_merge($currentComponents, $components));
+        Registry::push('genie_config', 'components', array_merge(static::getComponents(), $components));
 
         return $this;
     }

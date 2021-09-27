@@ -41,7 +41,7 @@ class CheckboxField extends Field
 
 
     /**
-     *Text shown along side the checkbox
+     *Text shown alongside the checkbox
      *
      * @param  string  $message
      *
@@ -69,7 +69,7 @@ class CheckboxField extends Field
 
 
     /**
-     * Specify if there should be an "toggle all" option
+     * Specify if there should be a "toggle all" option
      *
      * @param  bool  $toggle
      *
@@ -85,7 +85,7 @@ class CheckboxField extends Field
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('checkbox');

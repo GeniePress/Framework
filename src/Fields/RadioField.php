@@ -36,7 +36,7 @@ class RadioField extends Field
 
 
     /**
-     * Showuld other options be allowed?
+     * Should other options be allowed?
      *
      * @param  bool  $otherChoices
      *
@@ -80,7 +80,7 @@ class RadioField extends Field
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('radio');

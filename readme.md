@@ -16,9 +16,13 @@ All security vulnerabilities will be promptly addressed.
 
 The GeniePress framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-Version 2.0.2
+Version 2.1.0
 
 ## Change Log
+
+### 2.1.0
+- Code cleanup
+- `BackgroundJob` now accepts a list of actions to call rather than a list of callbacks.
 
 ### 2.0.2
 - Hide warnings on SendEmail

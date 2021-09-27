@@ -39,11 +39,7 @@ class Registry
             return static::$registry[$group];
         }
 
-        if (isset(static::$registry[$group][$index])) {
-            return static::$registry[$group][$index];
-        }
-
-        return $default;
+        return static::$registry[$group][$index] ?? $default;
     }
 
 
@@ -55,7 +51,7 @@ class Registry
      * @param  string  $index
      * @param  mixed  $value
      */
-    public static function push(string $group, string $index, $value)
+    public static function push(string $group, string $index, $value): void
     {
         if ( ! isset(static::$registry[$group])) {
             static::$registry[$group] = [];
@@ -71,7 +67,7 @@ class Registry
      * @param  string  $group
      * @param  mixed  $value
      */
-    public static function set(string $group, $value)
+    public static function set(string $group, $value): void
     {
         static::$registry[$group] = $value;
     }

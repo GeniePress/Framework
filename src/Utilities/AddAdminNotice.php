@@ -114,7 +114,7 @@ class AddAdminNotice
     /**
      *
      */
-    public function display()
+    public function display(): void
     {
         HookInto::action('admin_notices')
             ->run(function () {

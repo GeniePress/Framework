@@ -113,7 +113,7 @@ class HookInto
     /**
      * __return_false
      */
-    public function returnFalse()
+    public function returnFalse(): void
     {
         $this->callback = '__return_false';
         $this->register();
@@ -124,7 +124,7 @@ class HookInto
     /**
      * __return_true
      */
-    public function returnTrue()
+    public function returnTrue(): void
     {
         $this->callback = '__return_true';
         $this->register();
@@ -137,7 +137,7 @@ class HookInto
      *
      * @param  callable  $callback
      */
-    public function run(callable $callback)
+    public function run(callable $callback): void
     {
         $this->callback = $callback;
         $this->register();
@@ -146,13 +146,13 @@ class HookInto
 
 
     /**
-     * Add an hook onto our $hooks array
+     * Add a hook onto our $hooks array
      *
      * @param  string  $hook
      * @param  int  $sequence
      * @param  string  $type
      */
-    protected function add(string $hook, int $sequence, string $type)
+    protected function add(string $hook, int $sequence, string $type): void
     {
         if ($type === 'action') {
             $this->actions[$hook] = $sequence;
@@ -166,7 +166,7 @@ class HookInto
     /**
      * Add the action or filter
      */
-    protected function register()
+    protected function register(): void
     {
         $vars = Tools::getCallableParameters($this->callback);
 

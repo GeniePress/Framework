@@ -8,7 +8,7 @@ class EmailField extends TextField
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('email');

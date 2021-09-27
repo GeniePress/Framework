@@ -21,7 +21,7 @@ class FileField extends TextField
 
     /**
      * Specify the maximum filesize in MB in px allowed when uploading. Defaults to 0.
-     * The unit may also be included. eg. '256KB'
+     * The unit may also be included. e.g. "256KB"
      *
      * @param  string  $maxSize
      *
@@ -51,7 +51,7 @@ class FileField extends TextField
 
     /**
      * Specify the minimum filesize in MB required when uploading. Defaults to 0.
-     * The unit may also be included. eg. '256KB'
+     * The unit may also be included. e.g. '256KB'
      *
      * @param  string  $minSize
      *
@@ -96,7 +96,7 @@ class FileField extends TextField
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('file');

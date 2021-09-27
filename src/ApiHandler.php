@@ -35,7 +35,6 @@ class ApiHandler implements GenieComponent
          */
         HookInto::action('init')
             ->run(function () {
-
                 $path   = static::getPath();
                 $action = apply_filters(Genie::hookName('api_action'), Registry::get('genie_config', 'api_action'));
 
@@ -58,7 +57,7 @@ class ApiHandler implements GenieComponent
 
                         if ( ! static::canHandle($route)) {
                             Response::notFound([
-                                'message' => "Request: {$route} not found",
+                                'message' => "Request: $route not found",
                             ]);
                         }
 
@@ -94,7 +93,7 @@ class ApiHandler implements GenieComponent
                             foreach ($params as $param) {
                                 $name = $param->getName();
                                 if ( ! $param->isOptional() && ! Request::has($name)) {
-                                    Response::failure(['message' => "required parameter {$name} is missing"]);
+                                    Response::failure(['message' => "required parameter $name is missing"]);
                                 }
                                 $callbackParams[$name] = Request::get($name);
                             }
@@ -122,8 +121,8 @@ class ApiHandler implements GenieComponent
          */
         HookInto::filter(Genie::hookName('view_twig'))
             ->run(function (Environment $twig) {
-                    $function = new TwigFunction('api_url', [static::class, 'generateUrl']);
-                    $twig->addFunction($function);
+                $function = new TwigFunction('api_url', [static::class, 'generateUrl']);
+                $twig->addFunction($function);
 
                 return $twig;
             });
@@ -160,22 +159,13 @@ class ApiHandler implements GenieComponent
 
 
     /**
-     * get the api Path
-     *
-     * @return string
-     */
-        protected static function getPath(): string {
-                  return  apply_filters(Genie::hookName('api_path'), Registry::get('genie_config', 'api_path'));
-        }
-
-    /**
      * Register an ajax callback function
      *
      * @param  string  $route
      * @param  string  $method
      * @param  callable  $callback
      */
-    public static function register(string $route, string $method, callable $callback)
+    public static function register(string $route, string $method, callable $callback): void
     {
         static::$routes[$route] = (object) [
             'method'   => strtoupper(trim($method)),
@@ -185,5 +175,14 @@ class ApiHandler implements GenieComponent
 
 
 
+    /**
+     * get the api Path
+     *
+     * @return string
+     */
+    protected static function getPath(): string
+    {
+        return apply_filters(Genie::hookName('api_path'), Registry::get('genie_config', 'api_path'));
+    }
 
 }

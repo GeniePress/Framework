@@ -346,6 +346,20 @@ abstract class Field
 
 
     /**
+     * Set the metaQuery type
+     *
+     * @param $metaQuery
+     *
+     * @return $this
+     */
+    public function metaQuery($metaQuery): Field
+    {
+        return $this->set('meta_query', $metaQuery);
+    }
+
+
+
+    /**
      * Allows overriding WordPress fields
      *
      * @param $field
@@ -554,13 +568,6 @@ abstract class Field
 
 
 
-    protected function metaQuery($metaQuery): Field
-    {
-        return $this->set('meta_query', $metaQuery);
-    }
-
-
-
     /**
      * Now that we have generated the key, we can return a property hook
      *
@@ -589,7 +596,7 @@ abstract class Field
     /**
      * Set defaults for all Fields
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         // hack - can't seem to figure out how ACF adds _name to locally imported groups.
         // This is needed by the acf_format_value function
@@ -631,7 +638,7 @@ abstract class Field
         // Does this field not have any input? Used for Tab & Message
         $this->displayOnly(false);
 
-        // WordPress post field to override on save (e.g post_title)
+        // WordPress post field to override on save (e.g. post_title)
         $this->override(false);
     }
 

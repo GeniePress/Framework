@@ -19,91 +19,91 @@ class ApiCall implements JsonSerializable
      *
      * @var
      */
-    var $url;
+    protected $url;
 
     /**
      * Method
      *
-     * @var string
+     * @protected string
      */
-    var $method = 'POST';
+    protected $method = 'POST';
 
     /**
      * Timeout in seconds
      *
-     * @var int
+     * @protected int
      */
-    var $timeout = 10;
+    protected $timeout = 10;
 
     /**
      * How many redirections allowed?
      *
-     * @var int
+     * @protected int
      */
-    var $redirection = 5;
+    protected $redirection = 5;
 
     /**
      * Which http version to use?
      *
-     * @var string
+     * @protected string
      */
-    var $httpVersion = '1.0';
+    protected $httpVersion = '1.0';
 
     /**
      * Should this API call block script execution?
      *
-     * @var bool
+     * @protected bool
      */
-    var $blocking = true;
+    protected $blocking = true;
 
     /**
      * An array of additional headers to send
      *
-     * @var array
+     * @protected array
      */
-    var $headers = [];
+    protected $headers = [];
 
     /**
      * API call body
      *
-     * @var array
+     * @protected array
      */
-    var $body = [];
+    protected $body = [];
 
     /**
      * Data format
      *
-     * @var string
+     * @protected string
      */
-    var $data_format = 'query';
+    protected $data_format = 'query';
 
     /**
      * An Array of cookies to send with the request
      *
-     * @var array
+     * @protected array
      */
-    var $cookies = [];
+    protected $cookies = [];
 
     /**
      * The response
      *
-     * @var array
+     * @protected array
      */
-    var $response = [];
+    protected $response = [];
 
     /**
      * Should this API call be cached?
      *
-     * @var bool
+     * @protected bool
      */
-    var $cache = false;
+    protected $cache = false;
 
     /**
      * How long should the data be cached for?
      *
-     * @var int
+     * @protected int
      */
-    var $cacheFor = 300;
+    protected $cacheFor = 300;
 
 
 
@@ -115,19 +115,17 @@ class ApiCall implements JsonSerializable
     public function __construct($url)
     {
         $this->url = $url;
-
-        return $this;
     }
 
 
 
     /**
-     * Get shortcut
+     * GET shortcut
      *
      * @param  string  $url
      * @param  array  $vars
      *
-     * @return bool|mixed
+     * @return array|bool|object
      */
     public static function get(string $url, array $vars = [])
     {
@@ -137,9 +135,9 @@ class ApiCall implements JsonSerializable
             ->send();
         if ($call->wasSuccessful()) {
             return $call->getResponseBody();
-        } else {
-            return false;
         }
+
+        return false;
     }
 
 
@@ -150,9 +148,8 @@ class ApiCall implements JsonSerializable
      * @param $url
      * @param $vars
      *
-     * @return bool|mixed
+     * @return array|bool|object
      */
-
     public static function post($url, $vars)
     {
         $call = static::to($url)
@@ -160,9 +157,9 @@ class ApiCall implements JsonSerializable
             ->send();
         if ($call->wasSuccessful()) {
             return $call->getResponseBody();
-        } else {
-            return false;
         }
+
+        return false;
     }
 
 
@@ -300,7 +297,7 @@ class ApiCall implements JsonSerializable
     /**
      * Gets the response body
      *
-     * @return bool|mixed
+     * @return array|bool|object
      */
     public function getResponseBody()
     {
@@ -381,7 +378,7 @@ class ApiCall implements JsonSerializable
                 'data_format' => $this->data_format,
             ]));
 
-        if (false === ($this->response = get_transient($key)) or ! $this->cache) {
+        if ( ! $this->cache || ($this->response = get_transient($key)) === false) {
             // It wasn't there, so regenerate the data and save the transient
             $this->response = wp_remote_post($this->url, [
                     'method'      => $this->method,
@@ -444,7 +441,7 @@ class ApiCall implements JsonSerializable
      */
     public function wasSuccessful(): bool
     {
-        return ! static::failed();
+        return ! $this->failed();
     }
 
 

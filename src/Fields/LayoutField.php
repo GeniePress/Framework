@@ -36,7 +36,7 @@ class LayoutField extends GroupField
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('layout');
