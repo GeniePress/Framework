@@ -52,7 +52,7 @@ class TextField extends Field
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('text');

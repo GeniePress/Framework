@@ -61,7 +61,7 @@ class AjaxHandler implements GenieComponent
 
                         if ( ! static::canHandle($requestPath)) {
                             Response::notFound([
-                                'message' => "Request: {$requestPath} not found",
+                                'message' => "Request: $requestPath not found",
                             ]);
                         }
 
@@ -105,7 +105,7 @@ class AjaxHandler implements GenieComponent
                             foreach ($params as $param) {
                                 $name = $param->getName();
                                 if ( ! $param->isOptional() && ! Request::has($name)) {
-                                    Response::failure(['message' => "required parameter {$name} is missing"]);
+                                    Response::failure(['message' => "required parameter $name is missing"]);
                                 }
                                 $callbackParams[$name] = Request::get($name);
                             }
@@ -134,6 +134,7 @@ class AjaxHandler implements GenieComponent
             ->run(function (Environment $twig) {
                 $function = new TwigFunction('ajax_url', [static::class, 'generateUrl']);
                 $twig->addFunction($function);
+
                 return $twig;
             });
     }
@@ -181,11 +182,10 @@ class AjaxHandler implements GenieComponent
      * @param  string  $path
      * @param  callable  $callback
      */
-    public static function register(string $path, callable $callback)
+    public static function register(string $path, callable $callback): void
     {
         static::$paths[$path] = $callback;
     }
-
 
 
 
@@ -194,12 +194,12 @@ class AjaxHandler implements GenieComponent
      *
      * @return string
      */
-    protected static function getActionName()
+    protected static function getActionName(): string
     {
-        if (!static::$action) {
-
-            static::$action = apply_filters(Genie::hookName('ajax_action'),Registry::get('genie_config','ajax_action'));
+        if ( ! static::$action) {
+            static::$action = apply_filters(Genie::hookName('ajax_action'), Registry::get('genie_config', 'ajax_action'));
         }
+
         return static::$action;
     }
 }

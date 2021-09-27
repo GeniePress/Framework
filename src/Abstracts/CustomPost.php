@@ -12,7 +12,6 @@ use GeniePress\Utilities\ConvertString;
 use GeniePress\Utilities\HookInto;
 use GeniePress\WordPress;
 use JsonSerializable;
-use mysql_xdevapi\Exception;
 use WP_Error;
 
 /**
@@ -53,7 +52,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
      *
      * @var string
      */
-    static $postType = 'post';
+    public static $postType = 'post';
 
     /**
      * Should this be cached ?
@@ -107,21 +106,19 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
             ->run(function ($post_id) {
                 global $post;
 
-                if ( ! $post or $post->post_type !== static::$postType) {
+                if ( ! $post || $post->post_type !== static::$postType) {
                     return;
                 }
 
                 // Trigger a save
                 if (static::$triggerSave) {
                     static::getById($post_id)->save();
-                } else {
-                    if (static::$cache) {
-                        Cache::clearPostCache($post_id);
-                    }
+                } elseif (static::$cache) {
+                    Cache::clearPostCache($post_id);
                 }
             });
 
-        // After the post is saved... allow some of wordpress fields to be overWritten
+        // After the post is saved... allow some of WordPress fields to be overWritten
         HookInto::filter('wp_insert_post_data')
             ->run(function ($data, $postArray) {
                 // Make sure we have acf data
@@ -131,7 +128,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
                 // Not this post type?
                 $postType = $data['post_type'];
-                if ($postType != static::$postType) {
+                if ($postType !== static::$postType) {
                     return $data;
                 }
 
@@ -142,9 +139,9 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
                         $value = $postArray['acf'][$field['key']];
                         $field = $field['override'];
                         if (is_callable($field)) {
-                            [$field, $value] = call_user_func($field, $value);
+                            [$field, $value] = $field($value);
                         }
-                        if (in_array($field, WordPress::$postFields)) {
+                        if (in_array($field, WordPress::$postFields, true)) {
                             $data[$field] = $value;
                         }
                     }
@@ -171,9 +168,8 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
      *
      * @param  int|mixed  $id
      *
-     * @return void|WP_Error
      */
-    function __construct($id = null)
+    public function __construct($id = null)
     {
         // new custom post ?
         if ( ! $id) {
@@ -196,7 +192,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
             // No data ?
             if ( ! $postData) {
-                return new WP_Error("Could not find a ".static::$plural." with an ID of ".$id);
+                return;
             }
 
             $acfFields = get_fields($id);
@@ -275,9 +271,9 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
      *
      * @param $id
      *
-     * @return mixed
+     * @return static
      */
-    public static function getById($id)
+    public static function getById($id): CustomPost
     {
         return new static($id);
     }
@@ -285,7 +281,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
 
     /**
-     * Find a post by it's slug
+     * Find a post by its slug
      *
      * @param $slug
      *
@@ -334,7 +330,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
 
     /**
-     * Find a post by it's title
+     * Find a post by its title
      *
      * @param $title
      *
@@ -360,7 +356,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
      *
      * @return null|static
      */
-    public static function getCurrent()
+    public static function getCurrent(): ?CustomPost
     {
         return new static(get_the_ID());
     }
@@ -381,7 +377,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
     /**
      * Look through this custom post's schema and return the key for a field.
-     * This allows us use the key when creating new data with update_field.
+     * This allows us to use the key when creating new data with update_field.
      * The schema has to be attached from CreateSchema
      *
      * @param  string  $name
@@ -436,7 +432,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     /**
      * clear the cache for this post
      */
-    public function clearCache()
+    public function clearCache(): void
     {
         if ($this->ID && static::$cache) {
             Cache::clearPostCache($this->ID);
@@ -491,7 +487,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
                 'height'  => $src[2],
                 'resized' => $src[3],
             ];
-            if ($size && $imageSize == $size) {
+            if ($size && $imageSize === $size) {
                 return $images[$size];
             }
         }
@@ -542,7 +538,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
      *
      * @return $this
      */
-    public function save()
+    public function save(): CustomPost
     {
         $this->beforeSave();
 
@@ -597,7 +593,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     /**
      * After the post has been loaded from the database
      */
-    protected function afterRead()
+    protected function afterRead(): void
     {
     }
 
@@ -606,7 +602,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     /**
      * After save - Do something!
      */
-    protected function afterSave()
+    protected function afterSave(): void
     {
     }
 
@@ -615,7 +611,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     /**
      *  Update properties on this object
      */
-    protected function beforeCache()
+    protected function beforeCache(): void
     {
     }
 
@@ -625,7 +621,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
      * Things to do before delete!
      * Delete other objects / images etc.
      */
-    protected function beforeDelete()
+    protected function beforeDelete(): void
     {
     }
 
@@ -634,7 +630,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     /**
      * Before save - Set defaults / fill values
      */
-    protected function beforeSave()
+    protected function beforeSave(): void
     {
     }
 
@@ -644,7 +640,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
      * Check the validity of this object
      * Throw errors from here and catch from save
      */
-    protected function checkValidity()
+    protected function checkValidity(): void
     {
     }
 
@@ -653,7 +649,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     /**
      * Set defaults for this object
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         $this->post_status = 'publish';
         $this->post_type   = static::$postType;
@@ -702,12 +698,13 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
     /**
      * Capture and use ACF before the post is saved.
-     * We can override some of the wordpress fields here.
+     * We can override WordPress fields here.
      *
      * @param  array  $data
      * @param  array  $postArray
      *
      * @return array
+     * @noinspection PhpUnusedParameterInspection
      */
     protected static function override(array $data, array $postArray): array
     {

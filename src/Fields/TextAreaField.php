@@ -6,9 +6,9 @@ class TextAreaField extends TextField
 {
 
     /**
-     * Decides how to render new lines. Detauls to 'wpautop'. Choices of 'wpautop' (Automatically add paragraphs), 'br' (Automatically add <br>) or '' (No Formatting)
+     * Decides how to render new lines. Defaults to 'wpautop'. Choices of 'wpautop' (Automatically add paragraphs), 'br' (Automatically add <br>) or '' (No Formatting)
      *
-     * @param $newLines  string wpautop|br|ni;;
+     * @param $newLines  string wpautop|br|null
      *
      * @return $this
      */
@@ -36,7 +36,7 @@ class TextAreaField extends TextField
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('textarea');

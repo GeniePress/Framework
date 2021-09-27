@@ -8,6 +8,22 @@ class Collection extends ArrayObject
 {
 
     /**
+     * Add an item to the collection.
+     *
+     * @param  mixed  $item
+     *
+     * @return $this
+     */
+    public function add($item): Collection
+    {
+        $this->append($item);
+
+        return $this;
+    }
+
+
+
+    /**
      * Return all the items
      *
      * @return array
@@ -15,18 +31,6 @@ class Collection extends ArrayObject
     public function all(): array
     {
         return (array) $this;
-    }
-
-
-
-    /**
-     * Convert this to an array
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return $this->getArrayCopy();
     }
 
 
@@ -60,17 +64,13 @@ class Collection extends ArrayObject
 
 
     /**
-     * Add an item to the collection.
+     * Convert this to an array
      *
-     * @param  mixed  $item
-     *
-     * @return $this
+     * @return array
      */
-    public function add($item): Collection
+    public function toArray(): array
     {
-        $this->append($item);
-
-        return $this;
+        return $this->getArrayCopy();
     }
 
 }

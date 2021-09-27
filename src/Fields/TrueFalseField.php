@@ -3,13 +3,12 @@
 namespace GeniePress\Fields;
 
 use GeniePress\Abstracts\Field;
-use GeniePress\Fields\Traits\message;
 
 class TrueFalseField extends Field
 {
 
     /**
-     * Text shown along side the field
+     * Text shown alongside the field
      *
      * @param  string  $message
      *
@@ -51,7 +50,7 @@ class TrueFalseField extends Field
 
 
     /**
-     * Show an use an UI switch?
+     * Use a UI switch?
      *
      * @param  bool  $ui
      *
@@ -67,7 +66,7 @@ class TrueFalseField extends Field
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('true_false');

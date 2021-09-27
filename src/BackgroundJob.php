@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpExpressionResultUnusedInspection
+ */
 
 namespace GeniePress;
 
@@ -10,9 +13,10 @@ use Throwable;
  * Class BackgroundJob
  *
  *
- * BackgroundJob::start()
- *  ->add( [Object::class , 'method'], [ 'param1' => $x, 'param2' => $y ] )
- *  ->send();
+ * BackgroundJob::start('A description')
+ *   ->add( 'hook_name', $arg1, $arg2  )
+ *   ->add( 'hook_name', $arg1, $arg2  )
+ *   ->send();
  */
 class BackgroundJob implements GenieComponent
 {
@@ -23,14 +27,21 @@ class BackgroundJob implements GenieComponent
      *
      * @var int
      */
-    static $processingId = false;
+    protected static $processingId = false;
+
+    /**
+     * name of the background job
+     *
+     * @var string
+     */
+    protected $name;
 
     /**
      * Array of function calls to perform on this background Job.
      *
      * @var array
      */
-    var $calls = [];
+    protected $hooks = [];
 
     /**
      * Should invalid SSL be ignored?
@@ -44,7 +55,7 @@ class BackgroundJob implements GenieComponent
     /**
      * Setup
      */
-    public static function setup()
+    public static function setup(): void
     {
         //  Check if we're processing a background Job
         $variableName = static::getVariableName();
@@ -58,7 +69,7 @@ class BackgroundJob implements GenieComponent
             return;
         }
 
-        // This clever bit of code ends the connection so we don't hold up the user.
+        // This clever bit of code ends the connection, so we don't hold up the user.
         ob_end_clean();
         ignore_user_abort(true);
         ob_start();
@@ -75,26 +86,38 @@ class BackgroundJob implements GenieComponent
         // Run the background as the last init job
         HookInto::action('init', 10000)
             ->run(function () {
-                // Do we have a job to process ?
 
+                // Do we have a job to process ?
                 $job = get_post(static::$processingId);
                 if ( ! $job) {
                     exit;
                 }
 
-                $calls = unserialize(base64_decode($job->post_content));
-                foreach ($calls as $args) {
-                    $callback = array_shift($args);
-                    try {
-                        call_user_func_array($callback, $args);
-                    } catch (Throwable $exception) {
-                        do_action(Genie::hookName('background_job_error'), $exception, $callback, $args, $calls);
-                        break;
+                try {
+                    $hooks = json_decode(base64_decode($job->post_content), true, 512, JSON_THROW_ON_ERROR);
+                    foreach ($hooks as $args) {
+                        $hook = array_shift($args);
+                        do_action_ref_array($hook, $args);
                     }
+                } catch (Throwable $exception) {
+                    do_action(Genie::hookName('background_job_error'), $exception, $job);
                 }
+
                 wp_delete_post(static::$processingId, true);
                 exit;
             });
+    }
+
+
+
+    /**
+     * Constructor
+     *
+     * @param  string  $name
+     */
+    public function __construct(string $name = '')
+    {
+        $this->name = $name;
     }
 
 
@@ -114,23 +137,25 @@ class BackgroundJob implements GenieComponent
     /**
      * static constructor. Start a new BackgroundJob Call Stack
      *
+     * @param  string  $name
+     *
      * @return BackgroundJob
      */
-    public static function start(): BackgroundJob
+    public static function start(string $name = ''): BackgroundJob
     {
-        return new static();
+        return new static($name);
     }
 
 
 
     /**
-     * Add a job to the call Stack
+     * Add a hook to the call Stack
      *
      * @return $this
      */
-    function add(): BackgroundJob
+    public function add(): BackgroundJob
     {
-        $this->calls[] = func_get_args();
+        $this->hooks[] = func_get_args();
 
         return $this;
     }
@@ -142,7 +167,7 @@ class BackgroundJob implements GenieComponent
      *
      * @return $this
      */
-    function ignoreSSL(): BackgroundJob
+    public function ignoreSSL(): BackgroundJob
     {
         $this->ignoreSSL = true;
 
@@ -154,17 +179,18 @@ class BackgroundJob implements GenieComponent
     /**
      * Save the job and send it for processing.
      */
-    function send()
+    public function send(): void
     {
         //Save the job for processing
         $id = wp_insert_post([
             'post_type'    => 'genie_background_job',
-            'post_content' => base64_encode(serialize($this->calls)),
+            'post_title'   => $this->name,
+            'post_content' => base64_encode(json_encode($this->hooks)),
         ]);
 
         $variableName = static::getVariableName();
 
-        $url = home_url()."/?{$variableName}={$id}";
+        $url = home_url()."/?$variableName=$id";
 
         if ($this->ignoreSSL) {
             $context = stream_context_set_default([

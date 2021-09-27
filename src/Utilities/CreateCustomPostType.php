@@ -12,7 +12,7 @@ class CreateCustomPostType
 {
 
     /**
-     * see https://codex.wordpress.org/Function_Reference/register_post_type
+     * see https://codex.WordPress.org/Function_Reference/register_post_type
      *
      * @var array
      */
@@ -130,7 +130,7 @@ class CreateCustomPostType
      *
      * @return $this
      */
-    function addSupportFor($for): CreateCustomPostType
+    public function addSupportFor($for): CreateCustomPostType
     {
         // Turn it into an array if it's not one
         $for = is_array($for) ? $for : [$for];
@@ -150,7 +150,7 @@ class CreateCustomPostType
      *
      * @return $this
      */
-    function addTaxonomy(string $taxonomy): CreateCustomPostType
+    public function addTaxonomy(string $taxonomy): CreateCustomPostType
     {
         $this->definition['taxonomies'][] = $taxonomy;
 
@@ -164,7 +164,7 @@ class CreateCustomPostType
      *
      * @return $this
      */
-    function adminOnly(): CreateCustomPostType
+    public function adminOnly(): CreateCustomPostType
     {
         $this->set('capabilities', [
             'edit_post'          => 'update_core',
@@ -187,7 +187,7 @@ class CreateCustomPostType
      *
      * @return $this
      */
-    function backendOnly(): CreateCustomPostType
+    public function backendOnly(): CreateCustomPostType
     {
         $this->set('rewrite', false);
         $this->set('query_var', false);
@@ -204,7 +204,7 @@ class CreateCustomPostType
      *
      * @return $this
      */
-    function frontend(): CreateCustomPostType
+    public function frontend(): CreateCustomPostType
     {
         $this->set('rewrite', true);
         $this->set('query_var', true);
@@ -217,11 +217,11 @@ class CreateCustomPostType
 
 
     /**
-     * Setup a custom post type so it's not seen anywhere.
+     * Set up a custom post type to be hidden.
      *
      * @return $this
      */
-    function hidden(): CreateCustomPostType
+    public function hidden(): CreateCustomPostType
     {
         $this->set('show_ui', false);
         $this->set('show_in_nav_menus', false);
@@ -231,7 +231,7 @@ class CreateCustomPostType
 
 
 
-    function icon(string $icon): CreateCustomPostType
+    public function icon(string $icon): CreateCustomPostType
     {
         $this->set('menu_icon', $icon);
 
@@ -245,7 +245,7 @@ class CreateCustomPostType
      *
      * @param  int  $sequence
      */
-    function register(int $sequence = 20)
+    public function register(int $sequence = 20): void
     {
         HookInto::action('init', $sequence)
             ->run(function () {
@@ -262,13 +262,13 @@ class CreateCustomPostType
      *
      * @return $this
      */
-    function removeSupportFor($for): CreateCustomPostType
+    public function removeSupportFor($for): CreateCustomPostType
     {
         // Turn it into an array if it's not one
         $for = is_array($for) ? $for : [$for];
 
         foreach ($for as $support) {
-            if (($key = array_search($support, $this->definition['supports'])) !== false) {
+            if (($key = array_search($support, $this->definition['supports'], true)) !== false) {
                 unset($this->definition['supports'][$key]);
             }
         }
@@ -286,7 +286,7 @@ class CreateCustomPostType
      *
      * @return $this
      */
-    function set($attribute, $value): CreateCustomPostType
+    public function set($attribute, $value): CreateCustomPostType
     {
         $this->definition[$attribute] = $value;
 
@@ -303,7 +303,7 @@ class CreateCustomPostType
      *
      * @return $this
      */
-    function setLabel($label, $name): CreateCustomPostType
+    public function setLabel($label, $name): CreateCustomPostType
     {
         $this->definition['labels'][$label] = $name;
 
@@ -319,7 +319,7 @@ class CreateCustomPostType
      *
      * @return $this
      */
-    function setLabels(array $labels): CreateCustomPostType
+    public function setLabels(array $labels): CreateCustomPostType
     {
         foreach ($labels as $label => $value) {
             $this->setLabel($label, $value);

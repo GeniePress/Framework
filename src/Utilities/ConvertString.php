@@ -2,8 +2,6 @@
 
 namespace GeniePress\Utilities;
 
-
-
 /**
  * Class ConvertString
  * (string) ConvertString::From('Monkey Bar)->toPlural()->toTitleCase()
@@ -21,7 +19,7 @@ class ConvertString
      *
      * @var array
      */
-    var $words = [];
+    protected $words = [];
 
 
 
@@ -34,7 +32,7 @@ class ConvertString
     public function __construct(string $string, string $case = null)
     {
         if ($case === 'pascalCase') {
-            $string = ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $string)), '_');
+            $string = strtolower(ltrim(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $string), '_'));
         }
 
         $this->convertToArray($string);
@@ -103,7 +101,7 @@ class ConvertString
      */
     public function toLowerCase(): ConvertString
     {
-        array_walk($this->words, function (&$word) {
+        array_walk($this->words, static function (&$word) {
             $word = strtolower($word);
         });
 
@@ -131,7 +129,7 @@ class ConvertString
      */
     public function toPlural(): ConvertString
     {
-        $string    = EnglishInflector::pluralize((string) $this);
+        $string = EnglishInflector::pluralize((string) $this);
         $this->convertToArray($string[0]);
 
         return $this;
@@ -146,7 +144,7 @@ class ConvertString
      */
     public function toSingular(): ConvertString
     {
-        $string    = EnglishInflector::singularize((string) $this);
+        $string = EnglishInflector::singularize((string) $this);
         $this->convertToArray($string[0]);
 
         return $this;
@@ -214,8 +212,8 @@ class ConvertString
             'like',
         ];
         foreach ($this->words as $key => $word) {
-            // If this word is the first, or it's not one of our small words, capitalise it with ucwords().
-            if ($key == 0 or ! in_array(strtolower($word), $ignoreWords)) {
+            // If this word is the first, or it's not one of our small words, capitalise it with function ucwords().
+            if ($key === 0 || ! in_array(strtolower($word), $ignoreWords)) {
                 $this->words[$key] = ucwords($word);
             }
         }
@@ -232,7 +230,7 @@ class ConvertString
      */
     public function toUpperCase(): ConvertString
     {
-        array_walk($this->words, function (&$word) {
+        array_walk($this->words, static function (&$word) {
             $word = strtoupper($word);
         });
 
@@ -246,7 +244,7 @@ class ConvertString
      *
      * @param $string
      */
-    private function convertToArray($string)
+    private function convertToArray($string): void
     {
         $string = preg_replace('/[^A-Za-z0-9\-_ ]/', '', $string);
         $string = preg_replace('/[\-_]/', ' ', $string);

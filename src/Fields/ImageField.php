@@ -64,7 +64,7 @@ class ImageField extends FileField
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('image');

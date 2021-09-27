@@ -47,7 +47,7 @@ class RegisterAjax
      *
      * @param  callable  $callback
      */
-    public function run(callable $callback)
+    public function run(callable $callback): void
     {
         AjaxHandler::register($this->url, $callback);
     }

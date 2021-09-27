@@ -84,7 +84,7 @@ class PostObjectField extends Field
     /**
      * Set defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('post_object');

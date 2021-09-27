@@ -52,7 +52,7 @@ class DateField extends Field
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
 

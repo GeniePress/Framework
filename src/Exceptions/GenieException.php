@@ -27,7 +27,7 @@ class GenieException extends Exception implements JsonSerializable
      * @param  int  $code
      * @param  Throwable|null  $previous
      */
-    function __construct($message = '', $code = 0, Throwable $previous = null)
+    public function __construct($message = '', $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
         do_action(Genie::hookName('exception'), $this);

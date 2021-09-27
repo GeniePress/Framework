@@ -1,6 +1,13 @@
 <?php
+/**
+ * @noinspection SpellCheckingInspection
+ */
 
 namespace GeniePress\Utilities;
+
+use function in_array;
+use function is_array;
+use function strlen;
 
 final class EnglishInflector
 {
@@ -342,97 +349,18 @@ final class EnglishInflector
 
 
     /**
-     * {@inheritdoc}
-     */
-    public static function singularize(string $plural): array
-    {
-        $pluralRev      = strrev($plural);
-        $lowerPluralRev = strtolower($pluralRev);
-        $pluralLength   = \strlen($lowerPluralRev);
-
-        // Check if the word is one which is not inflected, return early if so
-        if (\in_array($lowerPluralRev, self::UNINFLECTED, true)) {
-            return [$plural];
-        }
-
-        // The outer loop iterates over the entries of the plural table
-        // The inner loop $j iterates over the characters of the plural suffix
-        // in the plural table to compare them with the characters of the actual
-        // given plural suffix
-        foreach (self::PLURAL_MAP as $map) {
-            $suffix       = $map[0];
-            $suffixLength = $map[1];
-            $j            = 0;
-
-            // Compare characters in the plural table and of the suffix of the
-            // given plural one by one
-            while ($suffix[$j] === $lowerPluralRev[$j]) {
-                // Let $j point to the next character
-                ++$j;
-
-                // Successfully compared the last character
-                // Add an entry with the singular suffix to the singular array
-                if ($j === $suffixLength) {
-                    // Is there any character preceding the suffix in the plural string?
-                    if ($j < $pluralLength) {
-                        $nextIsVocal = false !== strpos('aeiou', $lowerPluralRev[$j]);
-
-                        if ( ! $map[2] && $nextIsVocal) {
-                            // suffix may not succeed a vocal but next char is one
-                            break;
-                        }
-
-                        if ( ! $map[3] && ! $nextIsVocal) {
-                            // suffix may not succeed a consonant but next char is one
-                            break;
-                        }
-                    }
-
-                    $newBase   = substr($plural, 0, $pluralLength - $suffixLength);
-                    $newSuffix = $map[4];
-
-                    // Check whether the first character in the plural suffix
-                    // is uppercased. If yes, uppercase the first character in
-                    // the singular suffix too
-                    $firstUpper = ctype_upper($pluralRev[$j - 1]);
-
-                    if (\is_array($newSuffix)) {
-                        $singulars = [];
-
-                        foreach ($newSuffix as $newSuffixEntry) {
-                            $singulars[] = $newBase.($firstUpper ? ucfirst($newSuffixEntry) : $newSuffixEntry);
-                        }
-
-                        return $singulars;
-                    }
-
-                    return [$newBase.($firstUpper ? ucfirst($newSuffix) : $newSuffix)];
-                }
-
-                // Suffix is longer than word
-                if ($j === $pluralLength) {
-                    break;
-                }
-            }
-        }
-
-        // Assume that plural and singular is identical
-        return [$plural];
-    }
-
-
-
-    /**
-     * {@inheritdoc}
+     * @param  string  $singular
+     *
+     * @return array|string[]
      */
     public static function pluralize(string $singular): array
     {
         $singularRev      = strrev($singular);
         $lowerSingularRev = strtolower($singularRev);
-        $singularLength   = \strlen($lowerSingularRev);
+        $singularLength   = strlen($lowerSingularRev);
 
         // Check if the word is one which is not inflected, return early if so
-        if (\in_array($lowerSingularRev, self::UNINFLECTED, true)) {
+        if (in_array($lowerSingularRev, self::UNINFLECTED, true)) {
             return [$singular];
         }
 
@@ -478,7 +406,7 @@ final class EnglishInflector
                     // the singular suffix too
                     $firstUpper = ctype_upper($singularRev[$j - 1]);
 
-                    if (\is_array($newSuffix)) {
+                    if (is_array($newSuffix)) {
                         $plurals = [];
 
                         foreach ($newSuffix as $newSuffixEntry) {
@@ -500,5 +428,88 @@ final class EnglishInflector
 
         // Assume that plural is singular with a trailing `s`
         return [$singular.'s'];
+    }
+
+
+
+    /**
+     * @param  string  $plural
+     *
+     * @return array|string[]
+     */
+    public static function singularize(string $plural): array
+    {
+        $pluralRev      = strrev($plural);
+        $lowerPluralRev = strtolower($pluralRev);
+        $pluralLength   = strlen($lowerPluralRev);
+
+        // Check if the word is one which is not inflected, return early if so
+        if (in_array($lowerPluralRev, self::UNINFLECTED, true)) {
+            return [$plural];
+        }
+
+        // The outer loop iterates over the entries of the plural table
+        // The inner loop $j iterates over the characters of the plural suffix
+        // in the plural table to compare them with the characters of the actual
+        // given plural suffix
+        foreach (self::PLURAL_MAP as $map) {
+            $suffix       = $map[0];
+            $suffixLength = $map[1];
+            $j            = 0;
+
+            // Compare characters in the plural table and of the suffix of the
+            // given plural one by one
+            while ($suffix[$j] === $lowerPluralRev[$j]) {
+                // Let $j point to the next character
+                ++$j;
+
+                // Successfully compared the last character
+                // Add an entry with the singular suffix to the singular array
+                if ($j === $suffixLength) {
+                    // Is there any character preceding the suffix in the plural string?
+                    if ($j < $pluralLength) {
+                        $nextIsVocal = false !== strpos('aeiou', $lowerPluralRev[$j]);
+
+                        if ( ! $map[2] && $nextIsVocal) {
+                            // suffix may not succeed a vocal but next char is one
+                            break;
+                        }
+
+                        if ( ! $map[3] && ! $nextIsVocal) {
+                            // suffix may not succeed a consonant but next char is one
+                            break;
+                        }
+                    }
+
+                    $newBase   = substr($plural, 0, $pluralLength - $suffixLength);
+                    $newSuffix = $map[4];
+
+                    // Check whether the first character in the plural suffix
+                    // is uppercased. If yes, uppercase the first character in
+                    // the singular suffix too
+                    $firstUpper = ctype_upper($pluralRev[$j - 1]);
+
+                    if (is_array($newSuffix)) {
+                        $singulars = [];
+
+                        foreach ($newSuffix as $newSuffixEntry) {
+                            $singulars[] = $newBase.($firstUpper ? ucfirst($newSuffixEntry) : $newSuffixEntry);
+                        }
+
+                        return $singulars;
+                    }
+
+                    return [$newBase.($firstUpper ? ucfirst($newSuffix) : $newSuffix)];
+                }
+
+                // Suffix is longer than word
+                if ($j === $pluralLength) {
+                    break;
+                }
+            }
+        }
+
+        // Assume that plural and singular is identical
+        return [$plural];
     }
 }

@@ -49,7 +49,7 @@ class CacheBust implements GenieComponent
 
         // Check if script lives on this domain. Can't rewrite external scripts, they won't work.
         $base_url = apply_filters(Genie::hookName('cache_busting_path_base_url'), $wp_scripts->base_url, $src);
-        if ( ! strstr($src, $base_url)) {
+        if (strpos($src, $base_url) === false) {
             return $src;
         }
 
@@ -60,7 +60,7 @@ class CacheBust implements GenieComponent
         $file  = null;
 
         // If the folder starts with wp- then we can figure out where it lives on the filesystem
-        if (strstr($path, '/wp-')) {
+        if (strpos($path, '/wp-') !== false) {
             $file = untrailingslashit(ABSPATH).$path;
         }
         if ( ! file_exists($file)) {

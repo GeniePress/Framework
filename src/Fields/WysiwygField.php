@@ -37,7 +37,7 @@ class WysiwygField extends TextField
      * Specify the editor's toolbar. Defaults to 'full'.
      * Choices of 'full' (Full), 'basic' (Basic) or a custom toolbar (https://www.advancedcustomfields.com/resources/customize-the-wysiwyg-toolbars/)
      *
-     * @param  string  $toolbar
+     * @param  string  $toolbar  full|basic|custom
      *
      * @return $this
      */
@@ -51,7 +51,7 @@ class WysiwygField extends TextField
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('wysiwyg');

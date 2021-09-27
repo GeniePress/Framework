@@ -2,7 +2,6 @@
 
 namespace GeniePress;
 
-
 class Request
 {
 
@@ -11,7 +10,7 @@ class Request
      *
      * @var null
      */
-    protected static $data = null;
+    protected static $data;
 
     /**
      * was JSON data received in the body?
@@ -79,7 +78,7 @@ class Request
     /**
      * Collect Data from various input mechanisms
      */
-    public static function maybeParseInput()
+    public static function maybeParseInput(): void
     {
         // Done already?
         if ( ! is_null(static::$data)) {

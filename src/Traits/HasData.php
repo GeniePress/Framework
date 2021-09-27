@@ -66,7 +66,7 @@ trait HasData
      *
      * @return static
      */
-    public function fill(array $array)
+    public function fill(array $array): self
     {
         foreach ($array as $field => $value) {
             $this->data[$field] = $value;
@@ -80,9 +80,9 @@ trait HasData
     /**
      * Return all data for this post
      *
-     * @return mixed|void
+     * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }

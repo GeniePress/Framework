@@ -23,7 +23,7 @@ class Response
      *
      * @param  int  $responseCode
      */
-    function __construct(int $responseCode = 200)
+    public function __construct(int $responseCode = 200)
     {
         $this->responseCode = $responseCode;
     }
@@ -35,7 +35,7 @@ class Response
      *
      * @param  mixed  $data
      */
-    public static function error($data = [])
+    public static function error($data = []): void
     {
         $response = new static(500);
         $response->withData($data)
@@ -49,7 +49,7 @@ class Response
      *
      * @param  mixed  $data
      */
-    public static function failure($data = [])
+    public static function failure($data = []): void
     {
         $response = new static(400);
         $response->withData($data)
@@ -63,7 +63,7 @@ class Response
      *
      * @param  mixed  $data
      */
-    public static function notFound($data)
+    public static function notFound($data): void
     {
         $response = new static(404);
         $response->withData($data)
@@ -76,7 +76,7 @@ class Response
      * @param  mixed  $data
      * Send a Success response
      */
-    public static function success($data = [])
+    public static function success($data = []): void
     {
         $response = new static(200);
         $response->withData($data)
@@ -88,7 +88,7 @@ class Response
     /**
      * Send the response back to the browser.
      */
-    public function send()
+    public function send(): void
     {
         http_response_code($this->responseCode);
         header('Content-Type: application/json');
@@ -105,7 +105,7 @@ class Response
      *
      * @return $this
      */
-    function withData($data): Response
+    public function withData($data): Response
     {
         $this->data = $data;
 

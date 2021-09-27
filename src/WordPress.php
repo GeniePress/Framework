@@ -7,8 +7,8 @@ use GeniePress\Utilities\HookInto;
 use WP;
 
 /**
- * Class Wordpress
- * WordPress Helper Functions
+ * Class WordPress
+ * Helper Functions
  *
  * @package GeniePress
  */
@@ -16,11 +16,11 @@ class WordPress implements GenieComponent
 {
 
     /**
-     * a list of wordpress fields
+     * a list of WordPress fields
      *
      * @var string[]
      */
-    static $postFields = [
+    public static $postFields = [
         'ID',
         'post_author',
         'post_date',

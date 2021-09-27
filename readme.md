@@ -20,6 +20,10 @@ Version 2.0.2
 
 ## Change Log
 
+### 2.1.0
+- Code cleanup
+- `BackgroundJob` now accepts a list of actions to call rather than a list of callbacks.
+
 ### 2.0.2
 - Hide warnings on SendEmail
 

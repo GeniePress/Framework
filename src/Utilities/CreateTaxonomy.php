@@ -21,7 +21,7 @@ class CreateTaxonomy
     protected $attachTo = [];
 
     /**
-     * see https://codex.wordpress.org/Function_Reference/register_taxonomy
+     * see https://codex.WordPress.org/Function_Reference/register_taxonomy
      *
      * @var array
      */
@@ -176,7 +176,7 @@ class CreateTaxonomy
      *
      * @return $this
      */
-    function hidden(): CreateTaxonomy
+    public function hidden(): CreateTaxonomy
     {
         $this->set('show_ui', false);
         $this->set('show_in_nav_menus', false);
@@ -192,7 +192,7 @@ class CreateTaxonomy
      * @param  int  $sequence  The priority
      * @param  bool  $onActivation  Should this be registered on activation as well? defaults to true
      */
-    function register(int $sequence = 20, bool $onActivation = true)
+    public function register(int $sequence = 20, bool $onActivation = true): void
     {
         $hook = HookInto::action('init', $sequence);
         if ($onActivation) {
@@ -215,7 +215,7 @@ class CreateTaxonomy
      *
      * @return $this
      */
-    function set($attribute, $value): CreateTaxonomy
+    public function set($attribute, $value): CreateTaxonomy
     {
         $this->definition[$attribute] = $value;
 
@@ -232,7 +232,7 @@ class CreateTaxonomy
      *
      * @return $this
      */
-    function setLabel($label, $name): CreateTaxonomy
+    public function setLabel($label, $name): CreateTaxonomy
     {
         $this->definition['labels'][$label] = $name;
 
@@ -248,7 +248,7 @@ class CreateTaxonomy
      *
      * @return $this
      */
-    function setLabels(array $labels): CreateTaxonomy
+    public function setLabels(array $labels): CreateTaxonomy
     {
         foreach ($labels as $label => $value) {
             $this->setLabel($label, $value);

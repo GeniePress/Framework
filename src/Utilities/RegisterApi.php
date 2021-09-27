@@ -112,7 +112,7 @@ class RegisterApi
      *
      * @param  callable  $callback
      */
-    public function run(callable $callback)
+    public function run(callable $callback): void
     {
         ApiHandler::register($this->url, $this->method, $callback);
     }

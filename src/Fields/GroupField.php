@@ -36,9 +36,7 @@ class GroupField extends Field
      */
     public function withFields(array $fields): GroupField
     {
-        $newFields = array_merge($this->sub_fields, $fields);
-
-        return $this->set('sub_fields', $newFields);
+        return $this->set('sub_fields', array_merge($this->sub_fields, $fields));
     }
 
 
@@ -46,7 +44,7 @@ class GroupField extends Field
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('group');

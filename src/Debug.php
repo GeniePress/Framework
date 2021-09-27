@@ -2,6 +2,8 @@
 
 namespace GeniePress;
 
+use JsonException;
+
 /**
  * Class Debug
  *
@@ -14,13 +16,15 @@ class Debug
      * Dump a variable to the console
      *
      * @param  mixed  $var
+     *
+     * @throws JsonException
      */
-    public static function console($var)
+    public static function console($var): void
     {
-        if (is_array($var) or is_object($var)) {
-            $var = json_encode($var);
+        if (is_array($var) || is_object($var)) {
+            $var = json_encode($var, JSON_THROW_ON_ERROR);
         } else {
-            $var = "$var";
+            $var = "\"$var\"";
         }
         echo "<script>console.log($var)</script>";
     }
@@ -32,9 +36,9 @@ class Debug
      *
      * @param $var
      */
-    public static function d($var)
+    public static function d($var): void
     {
-        if (is_array($var) or is_object($var)) {
+        if (is_array($var) || is_object($var)) {
             $var = print_r($var, true);
         }
         print "<pre>$var</pre>";
@@ -47,7 +51,7 @@ class Debug
      *
      * @param $var
      */
-    public static function dd($var)
+    public static function dd($var): void
     {
         self::d($var);
         exit;

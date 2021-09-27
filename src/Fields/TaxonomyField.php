@@ -8,7 +8,7 @@ class TaxonomyField extends Field
 {
 
     /**
-     * Specify if terms added should be added to Wordpress
+     * Specify if terms added should be added to WordPress
      *
      * @param  bool  $addTerms
      *
@@ -40,7 +40,7 @@ class TaxonomyField extends Field
      * Choices of 'checkbox' (Checkbox inputs), 'multi_select' (Select field - multiple),
      * 'radio' (Radio inputs) or 'select' (Select field)
      *
-     * @param  string  $type
+     * @param  string  $type  checkbox|multi_select|radio|select
      *
      * @return $this
      */
@@ -112,7 +112,7 @@ class TaxonomyField extends Field
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('taxonomy');

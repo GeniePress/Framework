@@ -36,9 +36,9 @@ class MessageField extends Field
 
 
     /**
-     * Decides how to render new lines. Detauls to 'wpautop'. Choices of 'wpautop' (Automatically add paragraphs), 'br' (Automatically add <br>) or '' (No Formatting)
+     * Decides how to render new lines. Defaults to 'wpautop'. Choices of 'wpautop' (Automatically add paragraphs), 'br' (Automatically add <br>) or '' (No Formatting)
      *
-     * @param $newLines  string wpautop|br|ni;;
+     * @param $newLines  string wpautop|br|''
      *
      * @return $this
      */
@@ -52,7 +52,7 @@ class MessageField extends Field
     /**
      * Set Defaults
      */
-    protected function setDefaults()
+    protected function setDefaults(): void
     {
         parent::setDefaults();
         $this->type('message');
