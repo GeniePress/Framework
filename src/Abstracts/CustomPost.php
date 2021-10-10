@@ -3,6 +3,7 @@
 namespace GeniePress\Abstracts;
 
 use GeniePress\Cache;
+use GeniePress\Debug;
 use GeniePress\Genie;
 use GeniePress\Interfaces\GenieComponent;
 use GeniePress\Registry;
@@ -195,11 +196,26 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
                 return;
             }
 
-            $acfFields = get_fields($id);
-            if (is_array($acfFields)) {
-                foreach ($acfFields as $field => $value) {
-                    $postData[$field] = $value;
+            // This causes WordPress to load and cache call metadata so
+            // subsequent calls to get_field don't hit the db
+            get_post_meta($id);
+
+            // load our fields definitions
+            $fields = static::getFields();
+
+            foreach ($fields as $field) {
+                if ($field['displayOnly']) {
+                    continue;
                 }
+
+                $name  = $field['name'];
+                $value = get_field($name, $id);
+
+                if (isset($field['cast']) && method_exists($field['cast'], 'get')) {
+                    $value = $field['cast']::get(get_field($name, $id, false), $field, $id);
+                }
+
+                $postData[$name] = $value;
             }
 
             $this->fill($postData);
@@ -211,7 +227,9 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
             }
         }
 
-        $this->originalData = $this->data;
+        // clone - just in case we have objects
+        $this->originalData = self::clone($this->data);
+
         $this->afterRead();
     }
 
@@ -574,12 +592,18 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
 
                 // Only update if we need to.
                 if ( ! array_key_exists($name, $this->originalData) || $this->originalData[$name] !== $this->data[$name]) {
-                    update_field($key, $this->data[$name], $this->ID);
+                    $value = $this->data[$name];
+                    if (isset($field['cast']) && method_exists($field['cast'], 'set')) {
+                        $value = $field['cast']::set($value, $field, $this->ID);
+                    }
+
+                    update_field($key, $value, $this->ID);
                 }
             }
         }
 
-        $this->originalData = $this->data;
+        // clone - just in case we have objects
+        $this->originalData = self::clone($this->data);
 
         $this->clearCache();
 
@@ -653,6 +677,30 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     {
         $this->post_status = 'publish';
         $this->post_type   = static::$postType;
+    }
+
+
+
+    /**
+     * Clone the properties of this object
+     *
+     * @param $array
+     *
+     * @return array
+     */
+    protected static function clone($array): array
+    {
+        return array_map(static function ($element) {
+            if (is_array($element)) {
+                return self::clone($element);
+            }
+
+            if (is_object($element)) {
+                return clone $element;
+            }
+
+            return $element;
+        }, $array);
     }
 
 
