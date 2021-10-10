@@ -16,18 +16,25 @@ All security vulnerabilities will be promptly addressed.
 
 The GeniePress framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-Version 2.1.0
+Version 2.2.0
 
 ## Change Log
 
+### 2.2.0
+
+- New `cast()` method for fields definitions.
+
 ### 2.1.0
+
 - Code cleanup
 - `BackgroundJob` now accepts a list of actions to call rather than a list of callbacks.
 
 ### 2.0.2
+
 - Hide warnings on SendEmail
 
 ### 2.0.1
+
 - `CreateTaxonomy` and `CreateSchema` are now activated on plugin activation
 - New methods in CreateTaxonomy to get the definition and set and get the taxonomy
 
@@ -42,4 +49,5 @@ Version 2.1.0
 - New `setHookPrefix` method on `Genie` that will prefix all hooks and filters.
 
 ### 1.1.1
+
 - Removed dependencies for Laravel Collection and Symphony EnglishInflector

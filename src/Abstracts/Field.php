@@ -2,7 +2,16 @@
 
 namespace GeniePress\Abstracts;
 
+use GeniePress\Casts\Base64Cast;
+use GeniePress\Casts\BoolCast;
+use GeniePress\Casts\DateCast;
+use GeniePress\Casts\DateTimeCast;
+use GeniePress\Casts\IntCast;
+use GeniePress\Casts\JsonCast;
+use GeniePress\Casts\StringCast;
+use GeniePress\Casts\TimeCast;
 use GeniePress\Genie;
+use GeniePress\Interfaces\Cast;
 use GeniePress\Traits\HasData;
 use GeniePress\Utilities\ConvertString;
 use GeniePress\Utilities\HookInto;
@@ -31,6 +40,7 @@ use GeniePress\Utilities\HookInto;
  * @property mixed|bool $displayOnly
  * @property mixed|bool $metaQuery
  * @property mixed|bool $override
+ * @property string $cast
  */
 abstract class Field
 {
@@ -128,6 +138,48 @@ abstract class Field
     public function append(string $string): Field
     {
         return $this->set('append', $string);
+    }
+
+
+
+    /**
+     * Set the type of data this field is cast to.
+     *
+     * @param  mixed  $type  base64|json|int|string|bool|date|datetime|time| callable
+     *
+     * @return $this
+     */
+    public function castAs($type): Field
+    {
+        switch ($type) {
+            case null :
+                return $this;
+            case 'string' :
+                return $this->set('cast', StringCast::class);
+            case 'bool' :
+                return $this->set('cast', BoolCast::class);
+            case 'array' :
+            case 'json' :
+                return $this->set('cast', JsonCast::class);
+            case 'base64' :
+                return $this->set('cast', Base64Cast::class);
+            case 'int' :
+                return $this->set('cast', IntCast::class);
+            case 'date' :
+                return $this->set('cast', DateCast::class);
+            case 'datetime' :
+                return $this->set('cast', DateTimeCast::class);
+            case 'time' :
+                return $this->set('cast', TimeCast::class);
+        }
+
+        $interfaces = class_implements($type);
+
+        if ($interfaces && in_array(Cast::class, $interfaces, true)) {
+            return $this->set('cast', $type);
+        }
+
+        return $this;
     }
 
 
@@ -640,6 +692,8 @@ abstract class Field
 
         // WordPress post field to override on save (e.g. post_title)
         $this->override(false);
+
+        $this->castAs(null);
     }
 
 
