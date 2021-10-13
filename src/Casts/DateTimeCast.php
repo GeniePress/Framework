@@ -4,11 +4,13 @@ namespace GeniePress\Casts;
 
 use DateTime;
 use DateTimeZone;
-use GeniePress\Debug;
+use Exception;
 use GeniePress\Interfaces\Cast;
 
 class DateTimeCast implements Cast
 {
+
+    protected static $returnFormat = 'Y-m-d H:i:s';
 
     /**
      * After reading from the database, cast this value to
@@ -18,12 +20,23 @@ class DateTimeCast implements Cast
      * @param  int  $post_id
      *
      * @return DateTime
+     * @throws Exception
      */
     public static function get($value, array $field, int $post_id): DateTime
     {
         $tz = new DateTimeZone(wp_timezone_string());
 
-        return DateTime::createFromFormat('Y-m-d H:i:s', $value, $tz);
+        try {
+            if ( ! $value) {
+                $value = $field['default_value'];
+            }
+            if ($value) {
+                return new DateTime($value, $tz);
+            }
+        } catch (Exception $e) {
+        }
+
+        return new DateTime('now', $tz);
     }
 
 
@@ -39,6 +52,6 @@ class DateTimeCast implements Cast
      */
     public static function set($value, array $field, int $post_id): string
     {
-        return $value->format('Y-m-d H:i:s');
+        return $value->format(self::$returnFormat);
     }
 }

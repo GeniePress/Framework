@@ -677,6 +677,26 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     {
         $this->post_status = 'publish';
         $this->post_type   = static::$postType;
+
+        $fields = static::getFields();
+
+        if ($fields) {
+            foreach ($fields as $field) {
+                if ($field['displayOnly']) {
+                    continue;
+                }
+
+                $name = $field['name'];
+
+                $default = $field['default_value'];
+                if (isset($field['cast']) && method_exists($field['cast'], 'get')) {
+                    $default = $field['cast']::get($default, $field, $this->ID);
+                }
+                if ($default) {
+                    $this->$name = $default;
+                }
+            }
+        }
     }
 
 
