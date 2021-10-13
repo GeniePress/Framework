@@ -11,7 +11,7 @@
         "php": "^7.3.0|^8.0",
         "ext-curl": "*",
         "ext-json": "*",
-        "twig/twig": "^2.1",
+        "twig/twig": "^3.3",
         "inlinestyle/inlinestyle": "^1.2.7"
     },
     "autoload": {
