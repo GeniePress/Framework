@@ -16,9 +16,14 @@ All security vulnerabilities will be promptly addressed.
 
 The GeniePress framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-Version 2.2.0
+Version 2.3.0
 
 ## Change Log
+
+### 2.3.0
+
+- `setDefaults()` now looks at field definitions
+- Move to Twig 3
 
 ### 2.2.0
 
