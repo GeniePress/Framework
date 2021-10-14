@@ -16,9 +16,15 @@ All security vulnerabilities will be promptly addressed.
 
 The GeniePress framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-Version 2.3.0
+Version 3.0.0
 
 ## Change Log
+
+### 3.0.0
+- Moved the need for `GenieComponent` Interface
+- new way to bootstrap genie `Genie->bootstrap()`
+- Components moved to a new folder
+- New Template Component
 
 ### 2.3.0
 
