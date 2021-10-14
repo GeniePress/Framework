@@ -2,8 +2,6 @@
 
 namespace GeniePress\Utilities;
 
-use GeniePress\View;
-
 class AddAdminNotice
 
 {
@@ -159,13 +157,9 @@ class AddAdminNotice
      */
     public function render(): string
     {
-        return View::with('_admin_notice.twig')
-            ->addVars([
-                'type'        => $this->type,
-                'message'     => $this->message,
-                'dismissible' => $this->dismissible,
-            ])
-            ->render();
+        $dismissible = $this->dismissible ? 'is-dismissible' : '';
+
+        return "<div class='notice notice-$this->type $dismissible'><p><strong>$this->message</strong></p></div>";
     }
 
 }

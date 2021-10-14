@@ -1,8 +1,12 @@
 <?php
 
-namespace GeniePress;
+namespace GeniePress\Components;
 
-use GeniePress\Interfaces\GenieComponent;
+use GeniePress\Genie;
+use GeniePress\Registry;
+use GeniePress\Request;
+use GeniePress\Response;
+use GeniePress\Tools;
 use GeniePress\Utilities\HookInto;
 use Throwable;
 use Twig\Environment;
@@ -13,7 +17,7 @@ use Twig\TwigFunction;
  *
  * @package GeniePress
  */
-class AjaxHandler implements GenieComponent
+class AjaxHandler
 {
 
     /**
@@ -34,9 +38,15 @@ class AjaxHandler implements GenieComponent
 
     /**
      * Setup Actions, Filters and Shortcodes
+     *
+     * @param  string  $action
      */
-    public static function setup()
+    public static function setup(string $action = ''): void
     {
+        if ($action) {
+            static::$action = $action;
+        }
+
         /**
          * Handle the ajax call.
          */
@@ -197,9 +207,9 @@ class AjaxHandler implements GenieComponent
     protected static function getActionName(): string
     {
         if ( ! static::$action) {
-            static::$action = apply_filters(Genie::hookName('ajax_action'), Registry::get('genie_config', 'ajax_action'));
+            static::$action = Registry::get('genie_config', 'ajax_action', 'ajax');
         }
 
-        return static::$action;
+        return apply_filters(Genie::hookName('ajax_action'), static::$action);
     }
 }

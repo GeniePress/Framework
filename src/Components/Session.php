@@ -1,8 +1,9 @@
 <?php
 
-namespace GeniePress;
+namespace GeniePress\Components;
 
-use GeniePress\Interfaces\GenieComponent;
+use GeniePress\Genie;
+use GeniePress\Registry;
 use GeniePress\Utilities\AddShortcode;
 use GeniePress\Utilities\HookInto;
 
@@ -12,18 +13,30 @@ use GeniePress\Utilities\HookInto;
  *
  * @package GeniePress
  */
-class Session implements GenieComponent
+class Session
 {
+
+    /**
+     * the name of the session
+     * @var string
+     */
+    protected static $sessionName = '';
+
+
 
     /**
      * Setup
      */
-    public static function setup()
+    public static function setup($sessionName = '', $hook = 'after_setup_theme', $priority = 10): void
     {
+        if ($sessionName) {
+            static::$sessionName = $sessionName;
+        }
+
         // Run once everything has been set up
-        HookInto::action('after_setup_theme')
+        HookInto::action($hook, $priority)
             ->run(function () {
-                $sessionName = apply_filters(Genie::hookName('session_name'), Registry::get('genie_config', 'session_name'));
+                $sessionName = static::getSessionName();
 
                 session_name($sessionName);
 
@@ -232,6 +245,22 @@ class Session implements GenieComponent
         }
 
         return $lookAt;
+    }
+
+
+
+    /**
+     * get the name to use for the ajax action
+     *
+     * @return string
+     */
+    protected static function getSessionName(): string
+    {
+        if ( ! static::$sessionName) {
+            static::$sessionName = Registry::get('genie_config', 'session_name', 'genie_session');
+        }
+
+        return apply_filters(Genie::hookName('session_name'), static::$sessionName);
     }
 
 }

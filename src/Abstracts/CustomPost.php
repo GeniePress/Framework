@@ -3,15 +3,13 @@
 namespace GeniePress\Abstracts;
 
 use GeniePress\Cache;
-use GeniePress\Debug;
+use GeniePress\Components\WordPress;
 use GeniePress\Genie;
-use GeniePress\Interfaces\GenieComponent;
+use GeniePress\Library\Collection;
 use GeniePress\Registry;
 use GeniePress\Traits\HasData;
-use GeniePress\Utilities\Collection;
 use GeniePress\Utilities\ConvertString;
 use GeniePress\Utilities\HookInto;
-use GeniePress\WordPress;
 use JsonSerializable;
 use WP_Error;
 
@@ -43,7 +41,7 @@ use WP_Error;
  * @property string post_mime_type
  * @property string comment_count
  */
-abstract class CustomPost implements JsonSerializable, GenieComponent
+abstract class CustomPost implements JsonSerializable
 {
 
     use HasData;
@@ -101,7 +99,7 @@ abstract class CustomPost implements JsonSerializable, GenieComponent
     /**
      * Setup WordPress Hooks, filters and register necessary method calls.
      */
-    public static function setup()
+    public static function setup(): void
     {
         HookInto::action('acf/save_post', 20)
             ->run(function ($post_id) {

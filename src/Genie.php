@@ -2,6 +2,14 @@
 
 namespace GeniePress;
 
+use GeniePress\Components\AjaxHandler;
+use GeniePress\Components\ApiHandler;
+use GeniePress\Components\BackgroundJob;
+use GeniePress\Components\CacheBust;
+use GeniePress\Components\Deploy;
+use GeniePress\Components\Session;
+use GeniePress\Components\View;
+use GeniePress\Components\WordPress;
 use GeniePress\Plugins\ACF;
 use GeniePress\Utilities\AddAdminNotice;
 use GeniePress\Utilities\HookInto;
@@ -13,6 +21,16 @@ use GeniePress\Utilities\HookInto;
  */
 class Genie
 {
+
+    /**
+     * A function to call on boot - This is the new way of loading Genie (rather than suing components).
+     * If this is set then the components array is ignored.
+     *
+     * @var callable
+     */
+    protected $boot;
+
+
 
     /**
      * Genie constructor.
@@ -32,19 +50,6 @@ class Genie
             }
         }
 
-        $viewFolders = [];
-
-        // Load folder from plugin or theme
-        if (file_exists($folder.'/src/twig')) {
-            $viewFolders[] = $folder.'/src/twig';
-        }
-
-        // Add genie folder last, so they can be overridden
-        $viewFolders[] = trailingslashit(__DIR__).'Views';
-
-        $this->addComponent(WordPress::class);
-
-        Registry::push('genie_config', 'view_folders', $viewFolders);
         Registry::push('genie_config', 'filename', $filename);
         Registry::push('genie_config', 'folder', $folder);
         Registry::push('genie_config', 'type', $type);
@@ -176,6 +181,7 @@ class Genie
      * @param  string  $component  classname
      *
      * @return $this
+     * @deprecated use bootstrap instead()
      */
     public function addComponent(string $component): Genie
     {
@@ -187,9 +193,26 @@ class Genie
 
 
     /**
+     * a new way of loading Genie.  Add what you need here by calling the setup() functions.
+     *
+     * @param  callable  $callable
+     *
+     * @return $this
+     */
+    public function bootstrap(callable $callable): Genie
+    {
+        $this->boot = $callable;
+
+        return $this;
+    }
+
+
+
+    /**
      * @param  string  $actionName
      *
      * @return Genie
+     * @deprecated use bootstrap instead()
      */
     public function enableAjaxHandler(string $actionName = 'ajax'): Genie
     {
@@ -207,6 +230,7 @@ class Genie
      * @param  string  $actionName
      *
      * @return Genie
+     * @deprecated use bootstrap instead()
      */
     public function enableApiHandler(string $pathName = 'api', string $actionName = 'genie_api'): Genie
     {
@@ -224,6 +248,7 @@ class Genie
      * @param  string  $variableName  The name of the variable used to trigger a background job. Defaults to "genie_bj_id"
      *
      * @return Genie
+     * @deprecated use bootstrap instead()
      */
     public function enableBackgroundJobs(string $variableName = 'genie_bj_id'): Genie
     {
@@ -238,6 +263,7 @@ class Genie
      * Enable The Cache Buster
      *
      * @return $this
+     * @deprecated use bootstrap instead()
      */
     public function enableCacheBuster(): Genie
     {
@@ -252,6 +278,7 @@ class Genie
      * @param  string|null  $folder  a folder relative to your plugin / theme. Defaults to "src/php/Releases"
      *
      * @return $this
+     * @deprecated use bootstrap instead()
      */
     public function enableDeploymentHandler(string $folder = 'src/php/Releases'): Genie
     {
@@ -272,6 +299,7 @@ class Genie
      * @param  string  $name  the name of the session variable. Defaults to "genie_session"
      *
      * @return $this
+     * @deprecated use bootstrap instead()
      */
     public function enableSessions(string $name = 'genie_session'): Genie
     {
@@ -321,11 +349,6 @@ class Genie
     {
         do_action(self::hookName('starting'));
 
-        $config = Registry::get('genie_config');
-
-        // Load Required Genie Components
-        View::setup();
-
         // We can't do anything without ACF
         if (ACF::isDisabled()) {
             AddAdminNotice::error(__('GeniePress requires <a href="https://www.advancedcustomfields.com/">Advanced Custom Fields</a> to be installed and enabled'))
@@ -335,11 +358,23 @@ class Genie
             return;
         }
 
-        //Load all our classes.
-        if (is_array($config['components'])) {
-            foreach ($config['components'] as $class) {
-                if (method_exists($class, 'setup')) {
-                    $class::setup();
+        $config = Registry::get('genie_config');
+
+        // New method - using bootable to load what we need.
+        if (is_callable($this->boot)) {
+            call_user_func($this->boot);
+        } else {
+            // Old method.
+            // Load Required Genie Components
+            $this->addComponent(WordPress::class);
+            $this->addComponent(View::class);
+
+            //Load all our classes.
+            if (is_array($config['components'])) {
+                foreach ($config['components'] as $class) {
+                    if (method_exists($class, 'setup')) {
+                        $class::setup();
+                    }
                 }
             }
         }
@@ -386,6 +421,7 @@ class Genie
      * @param  array  $components
      *
      * @return $this
+     * @deprecated use bootstrap instead()
      */
     public function withComponents(array $components): Genie
     {

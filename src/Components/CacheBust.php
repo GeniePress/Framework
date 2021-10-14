@@ -1,10 +1,10 @@
 <?php
 
-namespace GeniePress;
+namespace GeniePress\Components;
 
 use DateTime;
 use Exception;
-use GeniePress\Interfaces\GenieComponent;
+use GeniePress\Genie;
 use GeniePress\Utilities\HookInto;
 use WP_Scripts;
 
@@ -13,7 +13,7 @@ use WP_Scripts;
  *
  * @package GeniePress
  */
-class CacheBust implements GenieComponent
+class CacheBust
 {
 
     /**
@@ -21,7 +21,7 @@ class CacheBust implements GenieComponent
      *
      * @throws Exception
      */
-    public static function setup()
+    public static function setup(): void
     {
         HookInto::filter('script_loader_src')
             ->orFilter('style_loader_src')

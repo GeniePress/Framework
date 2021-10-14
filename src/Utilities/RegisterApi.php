@@ -2,7 +2,7 @@
 
 namespace GeniePress\Utilities;
 
-use GeniePress\ApiHandler;
+use GeniePress\Components\ApiHandler;
 
 class RegisterApi
 {

@@ -1,8 +1,12 @@
 <?php
 
-namespace GeniePress;
+namespace GeniePress\Components;
 
-use GeniePress\Interfaces\GenieComponent;
+use GeniePress\Genie;
+use GeniePress\Registry;
+use GeniePress\Request;
+use GeniePress\Response;
+use GeniePress\Tools;
 use GeniePress\Utilities\HookInto;
 use Throwable;
 use Twig\Environment;
@@ -13,7 +17,7 @@ use Twig\TwigFunction;
  *
  * @package GeniePress
  */
-class ApiHandler implements GenieComponent
+class ApiHandler
 {
 
     /**
@@ -23,20 +27,43 @@ class ApiHandler implements GenieComponent
      */
     protected static $routes = [];
 
+    /**
+     * The default path
+     * @var string
+     */
+    protected static $path;
+
+    /**
+     * The default action
+     * @var string
+     */
+    protected static $action;
+
 
 
     /**
      * Setup Actions, Filters and Shortcodes
+     *
+     * @param  string  $path
+     * @param  string  $action
      */
-    public static function setup()
+    public static function setup(string $path = '', string $action = ''): void
     {
+        if ($path) {
+            static::$path = $path;
+        }
+
+        if ($action) {
+            static::$action = $action;
+        }
+
         /**
          * Handle the ajax call.
          */
         HookInto::action('init')
             ->run(function () {
                 $path   = static::getPath();
-                $action = apply_filters(Genie::hookName('api_action'), Registry::get('genie_config', 'api_action'));
+                $action = static::getActionName();
 
                 add_rewrite_rule($path.'/(.*)$', 'wp-admin/admin-ajax.php?action='.$action.'&route=$1', 'top');
 
@@ -176,13 +203,33 @@ class ApiHandler implements GenieComponent
 
 
     /**
+     * get the name to use for the ajax action
+     *
+     * @return string
+     */
+    protected static function getActionName(): string
+    {
+        if ( ! static::$action) {
+            static::$action = Registry::get('genie_config', 'api_action', 'genie_api');
+        }
+
+        return apply_filters(Genie::hookName('api_action'), static::$action);
+    }
+
+
+
+    /**
      * get the api Path
      *
      * @return string
      */
     protected static function getPath(): string
     {
-        return apply_filters(Genie::hookName('api_path'), Registry::get('genie_config', 'api_path'));
+        if ( ! static::$path) {
+            static::$path = Registry::get('genie_config', 'api_path', 'api');
+        }
+
+        return apply_filters(Genie::hookName('api_path'), static::$path);
     }
 
 }

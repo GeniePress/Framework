@@ -1,8 +1,9 @@
 <?php
 
-namespace GeniePress;
+namespace GeniePress\Components;
 
-use GeniePress\Interfaces\GenieComponent;
+use GeniePress\Genie;
+use GeniePress\Tools;
 use GeniePress\Utilities\AddShortcode;
 use GeniePress\Utilities\HookInto;
 use Throwable;
@@ -21,7 +22,7 @@ use Twig\TwigFunction;
  *
  * @package GeniePress
  */
-class View implements GenieComponent
+class View
 {
 
     /**
@@ -64,14 +65,26 @@ class View implements GenieComponent
     /**
      * Add in our hooks and shortcodes
      */
-    public static function setup()
+    public static function setup(string $viewFolder = ''): void
     {
         // Note the sequence. this runs before anything else
         HookInto::action('init', 1)
-            ->run(function () {
+            ->run(function () use ($viewFolder) {
+                $viewFolders = [];
+
+                if ($viewFolder) {
+                    $viewFolders[] = $viewFolder;
+                }
+
+                // Load folder from plugin or theme
+                $defaultFolder = Genie::getFolder().'/src/twig';
+                if (file_exists($defaultFolder)) {
+                    $viewFolders[] = $defaultFolder;
+                }
+
                 $debug     = apply_filters(Genie::hookName('view_debug'), WP_DEBUG);
                 $cache     = apply_filters(Genie::hookName('view_cache'), ! WP_DEBUG);
-                $pathArray = apply_filters(Genie::hookName('view_folders'), Registry::get('genie_config', 'view_folders'));
+                $pathArray = apply_filters(Genie::hookName('view_folders'), $viewFolders);
 
                 $fileLoader = new FilesystemLoader($pathArray);
                 $loader     = new ChainLoader([$fileLoader]);

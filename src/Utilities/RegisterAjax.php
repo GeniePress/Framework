@@ -2,7 +2,7 @@
 
 namespace GeniePress\Utilities;
 
-use GeniePress\AjaxHandler;
+use GeniePress\Components\AjaxHandler;
 
 class RegisterAjax
 {

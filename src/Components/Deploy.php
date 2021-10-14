@@ -1,10 +1,13 @@
 <?php
 
-namespace GeniePress;
+namespace GeniePress\Components;
 
 use Exception;
-use GeniePress\Interfaces\GenieComponent;
+use GeniePress\Cache;
+use GeniePress\Genie;
+use GeniePress\Options;
 use GeniePress\Plugins\CLI;
+use GeniePress\Registry;
 use WP_CLI;
 
 /**
@@ -12,18 +15,33 @@ use WP_CLI;
  *
  * @package GeniePress
  */
-class Deploy implements GenieComponent
+class Deploy
 {
+
+    /**
+     * The folder where releases are stored. defaults to src/php/Releases
+     * @var string
+     */
+    protected static $releaseFolder;
+
+
 
     /**
      * Setup
      *
+     * @param  string  $releaseFolder
+     * @param  string  $command  the name of the wp-cli command to use
+     *
      * @throws Exception
      */
-    public static function setup()
+    public static function setup(string $releaseFolder = '', string $command = 'deploy'): void
     {
+        if ($releaseFolder) {
+            static::$releaseFolder = $releaseFolder;
+        }
+
         if (CLI::isEnabled()) {
-            WP_CLI::add_command('deploy', [static::class, 'deploy']);
+            WP_CLI::add_command($command, [static::class, 'deploy']);
         }
     }
 
@@ -66,11 +84,28 @@ class Deploy implements GenieComponent
 
 
     /**
+     * get the folder where releases are stored
+     *
+     * @return string
+     */
+    protected static function getReleaseFolder(): string
+    {
+        if ( ! static::$releaseFolder) {
+            $defaultReleaseFolder  = trailingslashit(Genie::getFolder()).'src/php/Releases';
+            static::$releaseFolder = Registry::get('genie_config', 'release_folder', $defaultReleaseFolder);
+        }
+
+        return apply_filters(Genie::hookName('release_folder'), static::$releaseFolder);
+    }
+
+
+
+    /**
      * Load and Run Releases
      */
     protected static function loadReleases(): void
     {
-        $releaseFolder = apply_filters(Genie::hookName('release_folder'), Registry::get('genie_config', 'release_folder'));
+        $releaseFolder = static::getReleaseFolder();
 
         if ( ! $releaseFolder || ! file_exists($releaseFolder)) {
             return;

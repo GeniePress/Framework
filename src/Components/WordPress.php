@@ -1,8 +1,8 @@
 <?php
 
-namespace GeniePress;
+namespace GeniePress\Components;
 
-use GeniePress\Interfaces\GenieComponent;
+use GeniePress\Genie;
 use GeniePress\Utilities\HookInto;
 use WP;
 
@@ -12,7 +12,7 @@ use WP;
  *
  * @package GeniePress
  */
-class WordPress implements GenieComponent
+class WordPress
 {
 
     /**
@@ -58,7 +58,7 @@ class WordPress implements GenieComponent
     /**
      * Constructor
      */
-    public static function setup()
+    public static function setup(): void
     {
         // We process all variables here and also capture and query variables.
         HookInto::action('parse_request')

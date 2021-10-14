@@ -3,9 +3,11 @@
  * @noinspection PhpExpressionResultUnusedInspection
  */
 
-namespace GeniePress;
+namespace GeniePress\Components;
 
-use GeniePress\Interfaces\GenieComponent;
+use GeniePress\Genie;
+use GeniePress\Registry;
+use GeniePress\Request;
 use GeniePress\Utilities\HookInto;
 use Throwable;
 
@@ -18,7 +20,7 @@ use Throwable;
  *   ->add( 'hook_name', $arg1, $arg2  )
  *   ->send();
  */
-class BackgroundJob implements GenieComponent
+class BackgroundJob
 {
 
     /**
@@ -28,6 +30,13 @@ class BackgroundJob implements GenieComponent
      * @var int
      */
     protected static $processingId = false;
+
+    /**
+     * The variable name
+     *
+     * @var string
+     */
+    protected static $variableName = '';
 
     /**
      * name of the background job
@@ -54,9 +63,15 @@ class BackgroundJob implements GenieComponent
 
     /**
      * Setup
+     *
+     * @param  string  $variableName
      */
-    public static function setup(): void
+    public static function setup(string $variableName = ''): void
     {
+        if ($variableName) {
+            static::$variableName = $variableName;
+        }
+
         //  Check if we're processing a background Job
         $variableName = static::getVariableName();
 
@@ -86,7 +101,6 @@ class BackgroundJob implements GenieComponent
         // Run the background as the last init job
         HookInto::action('init', 10000)
             ->run(function () {
-
                 // Do we have a job to process ?
                 $job = get_post(static::$processingId);
                 if ( ! $job) {
@@ -209,11 +223,15 @@ class BackgroundJob implements GenieComponent
 
     /**
      * get the variable name used for the background job
-     * @return mixed|void
+     * @return string
      */
-    protected static function getVariableName()
+    protected static function getVariableName(): string
     {
-        return apply_filters(Genie::hookName('bj_id'), Registry::get('genie_config', 'bj_id'));
+        if ( ! static::$variableName) {
+            static::$variableName = Registry::get('genie_config', 'bj_id', 'genie_bj_id');
+        }
+
+        return apply_filters(Genie::hookName('bj_id'), static::$variableName);
     }
 
 }

@@ -3,11 +3,8 @@
  * @noinspection SpellCheckingInspection
  */
 
-namespace GeniePress\Utilities;
+namespace GeniePress\Library;
 
-use function in_array;
-use function is_array;
-use function strlen;
 
 final class EnglishInflector
 {

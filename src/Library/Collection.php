@@ -1,6 +1,6 @@
 <?php
 
-namespace GeniePress\Utilities;
+namespace GeniePress\Library;
 
 use ArrayObject;
 

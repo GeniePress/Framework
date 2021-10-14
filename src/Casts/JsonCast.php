@@ -22,6 +22,7 @@ class JsonCast implements Cast
         try {
             return json_decode($value, false, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
+            return false;
         }
     }
 
@@ -41,7 +42,7 @@ class JsonCast implements Cast
         try {
             return json_encode($value, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
         } catch (JsonException $e) {
-           return  '';
+            return '';
         }
     }
 }
