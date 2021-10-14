@@ -21,10 +21,14 @@ Version 3.0.0
 ## Change Log
 
 ### 3.0.0
+
 - Moved the need for `GenieComponent` Interface
-- new way to bootstrap genie `Genie->bootstrap()`
+- New way to bootstrap genie `Genie->bootstrap()`
+- Removed `withComponents` and `addComponent` from `Genie`
 - Components moved to a new folder
-- New Template Component
+- New `Template` Component
+- View moved to its own [repository](https://github.com/GeniePress/view)
+- `Collection` and `EnglishInflector` now stored in the Library folder
 
 ### 2.3.0
 

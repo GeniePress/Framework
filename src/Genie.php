@@ -2,14 +2,6 @@
 
 namespace GeniePress;
 
-use GeniePress\Components\AjaxHandler;
-use GeniePress\Components\ApiHandler;
-use GeniePress\Components\BackgroundJob;
-use GeniePress\Components\CacheBust;
-use GeniePress\Components\Deploy;
-use GeniePress\Components\Session;
-use GeniePress\Components\View;
-use GeniePress\Components\WordPress;
 use GeniePress\Plugins\ACF;
 use GeniePress\Utilities\AddAdminNotice;
 use GeniePress\Utilities\HookInto;
@@ -103,17 +95,6 @@ class Genie
 
 
 
-    /**
-     * Get the list of components registered with Genie
-     *
-     * @return array
-     */
-    public static function getComponents(): array
-    {
-        return Registry::get('genie_config', 'components', []);
-    }
-
-
 
     /**
      * Get the filename stored in the registry
@@ -176,23 +157,6 @@ class Genie
 
 
     /**
-     * Add a component into Genie
-     *
-     * @param  string  $component  classname
-     *
-     * @return $this
-     * @deprecated use bootstrap instead()
-     */
-    public function addComponent(string $component): Genie
-    {
-        $this->withComponents([$component]);
-
-        return $this;
-    }
-
-
-
-    /**
      * a new way of loading Genie.  Add what you need here by calling the setup() functions.
      *
      * @param  callable  $callable
@@ -204,108 +168,6 @@ class Genie
         $this->boot = $callable;
 
         return $this;
-    }
-
-
-
-    /**
-     * @param  string  $actionName
-     *
-     * @return Genie
-     * @deprecated use bootstrap instead()
-     */
-    public function enableAjaxHandler(string $actionName = 'ajax'): Genie
-    {
-        Registry::push('genie_config', 'ajax_action', $actionName);
-
-        return $this->addComponent(AjaxHandler::class);
-    }
-
-
-
-    /**
-     * Enable the API handler
-     *
-     * @param  string  $pathName
-     * @param  string  $actionName
-     *
-     * @return Genie
-     * @deprecated use bootstrap instead()
-     */
-    public function enableApiHandler(string $pathName = 'api', string $actionName = 'genie_api'): Genie
-    {
-        Registry::push('genie_config', 'api_path', $pathName);
-        Registry::push('genie_config', 'api_action', $actionName);
-
-        return $this->addComponent(ApiHandler::class);
-    }
-
-
-
-    /**
-     * Enable Background Jobs
-     *
-     * @param  string  $variableName  The name of the variable used to trigger a background job. Defaults to "genie_bj_id"
-     *
-     * @return Genie
-     * @deprecated use bootstrap instead()
-     */
-    public function enableBackgroundJobs(string $variableName = 'genie_bj_id'): Genie
-    {
-        Registry::push('genie_config', 'bj_id', $variableName);
-
-        return $this->addComponent(BackgroundJob::class);
-    }
-
-
-
-    /**
-     * Enable The Cache Buster
-     *
-     * @return $this
-     * @deprecated use bootstrap instead()
-     */
-    public function enableCacheBuster(): Genie
-    {
-        return $this->addComponent(CacheBust::class);
-    }
-
-
-
-    /**
-     * Enable The Deployment Handler
-     *
-     * @param  string|null  $folder  a folder relative to your plugin / theme. Defaults to "src/php/Releases"
-     *
-     * @return $this
-     * @deprecated use bootstrap instead()
-     */
-    public function enableDeploymentHandler(string $folder = 'src/php/Releases'): Genie
-    {
-        $folder = trailingslashit(static::getFolder()).$folder;
-
-        if (file_exists($folder)) {
-            Registry::push('genie_config', 'release_folder', $folder);
-        }
-
-        return $this->addComponent(Deploy::class);
-    }
-
-
-
-    /**
-     * Enable Genie Session Handler
-     *
-     * @param  string  $name  the name of the session variable. Defaults to "genie_session"
-     *
-     * @return $this
-     * @deprecated use bootstrap instead()
-     */
-    public function enableSessions(string $name = 'genie_session'): Genie
-    {
-        Registry::push('genie_config', 'session_name', $name);
-
-        return $this->addComponent(Session::class);
     }
 
 
@@ -363,20 +225,6 @@ class Genie
         // New method - using bootable to load what we need.
         if (is_callable($this->boot)) {
             call_user_func($this->boot);
-        } else {
-            // Old method.
-            // Load Required Genie Components
-            $this->addComponent(WordPress::class);
-            $this->addComponent(View::class);
-
-            //Load all our classes.
-            if (is_array($config['components'])) {
-                foreach ($config['components'] as $class) {
-                    if (method_exists($class, 'setup')) {
-                        $class::setup();
-                    }
-                }
-            }
         }
 
         // Register hooks
@@ -409,23 +257,6 @@ class Genie
     public function type(string $type): Genie
     {
         Registry::push('genie_config', 'type', $type);
-
-        return $this;
-    }
-
-
-
-    /**
-     * Add a bunch of components that should be loaded by Genie
-     *
-     * @param  array  $components
-     *
-     * @return $this
-     * @deprecated use bootstrap instead()
-     */
-    public function withComponents(array $components): Genie
-    {
-        Registry::push('genie_config', 'components', array_merge(static::getComponents(), $components));
 
         return $this;
     }
